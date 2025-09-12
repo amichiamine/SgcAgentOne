@@ -623,225 +623,6 @@
             // L'interface chat est déjà présente par défaut
         }
         
-        // === FONCTIONS POUR LA VUE FICHIERS ===
-        function setupFilesListeners() {
-            console.log('Setup files listeners');
-            
-            // Boutons principaux
-            const createFileBtn = document.getElementById('createFileBtn');
-            const refreshFilesBtn = document.getElementById('refreshFilesBtn');
-            
-            if (createFileBtn) {
-                createFileBtn.addEventListener('click', async () => {
-                    const fileName = prompt('Nom du nouveau fichier:', 'nouveau_fichier.txt');
-                    if (fileName) {
-                        await createFileViaAPI(fileName, 'Créer un nouveau fichier');
-                    }
-                });
-            }
-            
-            if (refreshFilesBtn) {
-                refreshFilesBtn.addEventListener('click', async () => {
-                    console.log('Actualisation de l\'arborescence');
-                    await sendAPIMessage('Actualise la liste des fichiers du projet');
-                });
-            }
-            
-            // Actions rapides
-            const createHtmlBtn = document.getElementById('createHtmlBtn');
-            const createCssBtn = document.getElementById('createCssBtn');
-            const createJsBtn = document.getElementById('createJsBtn');
-            const createPhpBtn = document.getElementById('createPhpBtn');
-            
-            if (createHtmlBtn) {
-                createHtmlBtn.addEventListener('click', async () => {
-                    const fileName = prompt('Nom du fichier HTML:', 'index.html');
-                    if (fileName) {
-                        await createFileViaAPI(fileName, 'Créer un fichier HTML avec template de base');
-                    }
-                });
-            }
-            
-            if (createCssBtn) {
-                createCssBtn.addEventListener('click', async () => {
-                    const fileName = prompt('Nom du fichier CSS:', 'style.css');
-                    if (fileName) {
-                        await createFileViaAPI(fileName, 'Créer un fichier CSS avec template de base');
-                    }
-                });
-            }
-            
-            if (createJsBtn) {
-                createJsBtn.addEventListener('click', async () => {
-                    const fileName = prompt('Nom du fichier JS:', 'script.js');
-                    if (fileName) {
-                        await createFileViaAPI(fileName, 'Créer un fichier JavaScript avec template de base');
-                    }
-                });
-            }
-            
-            if (createPhpBtn) {
-                createPhpBtn.addEventListener('click', async () => {
-                    const fileName = prompt('Nom du fichier PHP:', 'script.php');
-                    if (fileName) {
-                        await createFileViaAPI(fileName, 'Créer un fichier PHP avec template de base');
-                    }
-                });
-            }
-            
-            // Interactivité arborescence
-            document.querySelectorAll('.file-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    item.style.background = 'var(--secondary)';
-                    setTimeout(() => {
-                        item.style.background = '';
-                    }, 200);
-                });
-            });
-        }
-        
-        // === FONCTIONS POUR LA VUE BASE DE DONNÉES ===
-        function setupDatabaseListeners() {
-            const connectDbBtn = document.getElementById('connectDbBtn');
-            const createTableBtn = document.getElementById('createTableBtn');
-            const executeQueryBtn = document.getElementById('executeQueryBtn');
-            const clearQueryBtn = document.getElementById('clearQueryBtn');
-            const sqlEditor = document.getElementById('sqlEditor');
-            
-            if (connectDbBtn) {
-                connectDbBtn.addEventListener('click', async () => {
-                    console.log('Connexion base de données');
-                    await sendAPIMessage('Vérifie la connexion à la base de données SQLite et affiche les tables existantes');
-                });
-            }
-            
-            if (createTableBtn) {
-                createTableBtn.addEventListener('click', () => {
-                    const tableName = prompt('Nom de la nouvelle table:', 'ma_table');
-                    if (tableName) {
-                        const sql = `CREATE TABLE ${tableName} (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nom TEXT NOT NULL,
-    email TEXT UNIQUE,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);`;
-                        sqlEditor.value = sql;
-                        console.log('Template table créé:', tableName);
-                    }
-                });
-            }
-            
-            if (executeQueryBtn) {
-                executeQueryBtn.addEventListener('click', async () => {
-                    const query = sqlEditor.value.trim();
-                    if (query) {
-                        console.log('Exécution requête:', query);
-                        await executeQueryViaAPI(query);
-                    } else {
-                        showAPIMessage('Veuillez saisir une requête SQL', 'warning');
-                    }
-                });
-            }
-            
-            if (clearQueryBtn) {
-                clearQueryBtn.addEventListener('click', () => {
-                    if (sqlEditor) {
-                        sqlEditor.value = '';
-                        sqlEditor.focus();
-                    }
-                });
-            }
-            
-            // Select requêtes prédéfinies
-            const predefinedSelect = document.querySelector('select');
-            if (predefinedSelect) {
-                predefinedSelect.addEventListener('change', (e) => {
-                    if (e.target.value && sqlEditor) {
-                        const queries = {
-                            'tables': "SELECT name FROM sqlite_master WHERE type='table';",
-                            'users': 'CREATE TABLE users (id INTEGER PRIMARY KEY, nom TEXT, email TEXT);',
-                            'insert': "INSERT INTO users (nom, email) VALUES ('John Doe', 'john@example.com');"
-                        };
-                        sqlEditor.value = queries[e.target.value] || '';
-                    }
-                });
-            }
-        }
-        
-        // === FONCTIONS POUR LA VUE PARAMÈTRES ===
-        function setupSettingsListeners() {
-            // Boutons de thème
-            const themeButtons = document.querySelectorAll('[id*="theme"]');
-            themeButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    themeButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    console.log('Thème changé:', btn.id);
-                    
-                    let themeName = '';
-                    if (btn.id.includes('Commander')) themeName = 'SGC-Commander';
-                    else if (btn.id.includes('Dark')) themeName = 'Sombre classique';
-                    else if (btn.id.includes('Light')) themeName = 'Clair';
-                    
-                    showAPIMessage(`Thème "${themeName}" activé !`, 'success');
-                });
-            });
-            
-            // Boutons d'action
-            const regenerateApiBtn = document.getElementById('regenerateApiBtn');
-            if (regenerateApiBtn) {
-                regenerateApiBtn.addEventListener('click', async () => {
-                    if (confirm('Regénérer la clé API ? Cela invalidera la clé actuelle.')) {
-                        console.log('Regénération clé API');
-                        await sendAPIMessage('Régénère une nouvelle clé API de sécurité');
-                    }
-                });
-            }
-            
-            const exportConfigBtn = document.getElementById('exportConfigBtn');
-            if (exportConfigBtn) {
-                exportConfigBtn.addEventListener('click', async () => {
-                    console.log('Export configuration');
-                    await sendAPIMessage('Exporte la configuration actuelle vers un fichier sgc-config.json');
-                });
-            }
-            
-            const importConfigBtn = document.getElementById('importConfigBtn');
-            if (importConfigBtn) {
-                importConfigBtn.addEventListener('click', async () => {
-                    console.log('Import configuration');
-                    await sendAPIMessage('Importe une configuration depuis un fichier sgc-config.json');
-                });
-            }
-            
-            const clearLogsBtn = document.getElementById('clearLogsBtn');
-            if (clearLogsBtn) {
-                clearLogsBtn.addEventListener('click', async () => {
-                    if (confirm('Vider tous les logs système ?')) {
-                        console.log('Vidage des logs');
-                        await sendAPIMessage('Vide tous les logs système et fichiers temporaires');
-                    }
-                });
-            }
-            
-            const restartServerBtn = document.getElementById('restartServerBtn');
-            if (restartServerBtn) {
-                restartServerBtn.addEventListener('click', async () => {
-                    if (confirm('Redémarrer le serveur SGC-AgentOne ?')) {
-                        console.log('Redémarrage serveur');
-                        await sendAPIMessage('Redémarre le serveur SGC-AgentOne');
-                    }
-                });
-            }
-            
-            // Gestion des checkboxes
-            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', (e) => {
-                    console.log('Option changée:', e.target.nextElementSibling.textContent, 'Activé:', e.target.checked);
-                });
-            });
-        }
-        
         // === FONCTIONS D'AIDE API ===
         let currentAuthToken = null;
         
@@ -927,6 +708,227 @@
             
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // === FONCTIONS POUR LA VUE FICHIERS ===
+        function setupFilesListeners() {
+            console.log('Setup files listeners');
+            
+            // Boutons principaux
+            const createFileBtn = document.getElementById('createFileBtn');
+            const refreshFilesBtn = document.getElementById('refreshFilesBtn');
+            
+            if (createFileBtn) {
+                createFileBtn.addEventListener('click', async () => {
+                    const fileName = prompt('Nom du nouveau fichier:', 'nouveau_fichier.txt');
+                    if (fileName) {
+                        await createFileViaAPI(fileName, 'Créer un nouveau fichier');
+                    }
+                });
+            }
+            
+            if (refreshFilesBtn) {
+                refreshFilesBtn.addEventListener('click', async () => {
+                    console.log('Actualisation de l\'arborescence');
+                    await sendAPIMessage('Actualise la liste des fichiers du projet');
+                });
+            }
+            
+            // Actions rapides
+            const createHtmlBtn = document.getElementById('createHtmlBtn');
+            const createCssBtn = document.getElementById('createCssBtn');
+            const createJsBtn = document.getElementById('createJsBtn');
+            const createPhpBtn = document.getElementById('createPhpBtn');
+            
+            if (createHtmlBtn) {
+                createHtmlBtn.addEventListener('click', async () => {
+                    const fileName = prompt('Nom du fichier HTML:', 'index.html');
+                    if (fileName) {
+                        await createFileViaAPI(fileName, 'Créer un fichier HTML avec template de base');
+                    }
+                });
+            }
+            
+            if (createCssBtn) {
+                createCssBtn.addEventListener('click', async () => {
+                    const fileName = prompt('Nom du fichier CSS:', 'style.css');
+                    if (fileName) {
+                        await createFileViaAPI(fileName, 'Créer un fichier CSS avec template de base');
+                    }
+                });
+            }
+            
+            if (createJsBtn) {
+                createJsBtn.addEventListener('click', async () => {
+                    const fileName = prompt('Nom du fichier JS:', 'script.js');
+                    if (fileName) {
+                        await createFileViaAPI(fileName, 'Créer un fichier JavaScript avec template de base');
+                    }
+                });
+            }
+            
+            if (createPhpBtn) {
+                createPhpBtn.addEventListener('click', async () => {
+                    const fileName = prompt('Nom du fichier PHP:', 'script.php');
+                    if (fileName) {
+                        await createFileViaAPI(fileName, 'Créer un fichier PHP avec template de base');
+                    }
+                });
+            }
+            
+            // Interactivité arborescence
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    item.style.background = 'var(--secondary)';
+                    setTimeout(() => {
+                        item.style.background = '';
+                    }, 200);
+                });
+            });
+        }
+        
+        // === FONCTIONS POUR LA VUE BASE DE DONNÉES ===
+        function setupDatabaseListeners() {
+            console.log('Setup database listeners');
+            const connectDbBtn = document.getElementById('connectDbBtn');
+            const createTableBtn = document.getElementById('createTableBtn');
+            const executeQueryBtn = document.getElementById('executeQueryBtn');
+            const clearQueryBtn = document.getElementById('clearQueryBtn');
+            const sqlEditor = document.getElementById('sqlEditor');
+            
+            if (connectDbBtn) {
+                connectDbBtn.addEventListener('click', async () => {
+                    console.log('Connexion base de données');
+                    await sendAPIMessage('Vérifie la connexion à la base de données SQLite et affiche les tables existantes');
+                });
+            }
+            
+            if (createTableBtn) {
+                createTableBtn.addEventListener('click', () => {
+                    const tableName = prompt('Nom de la nouvelle table:', 'ma_table');
+                    if (tableName) {
+                        const sql = `CREATE TABLE ${tableName} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom TEXT NOT NULL,
+    email TEXT UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);`;
+                        sqlEditor.value = sql;
+                        console.log('Template table créé:', tableName);
+                    }
+                });
+            }
+            
+            if (executeQueryBtn) {
+                executeQueryBtn.addEventListener('click', async () => {
+                    const query = sqlEditor.value.trim();
+                    if (query) {
+                        console.log('Exécution requête:', query);
+                        await executeQueryViaAPI(query);
+                    } else {
+                        showAPIMessage('Veuillez saisir une requête SQL', 'warning');
+                    }
+                });
+            }
+            
+            if (clearQueryBtn) {
+                clearQueryBtn.addEventListener('click', () => {
+                    if (sqlEditor) {
+                        sqlEditor.value = '';
+                        sqlEditor.focus();
+                    }
+                });
+            }
+            
+            // Select requêtes prédéfinies
+            const predefinedSelect = document.querySelector('select');
+            if (predefinedSelect) {
+                predefinedSelect.addEventListener('change', (e) => {
+                    if (e.target.value && sqlEditor) {
+                        const queries = {
+                            'tables': "SELECT name FROM sqlite_master WHERE type='table';",
+                            'users': 'CREATE TABLE users (id INTEGER PRIMARY KEY, nom TEXT, email TEXT);',
+                            'insert': "INSERT INTO users (nom, email) VALUES ('John Doe', 'john@example.com');"
+                        };
+                        sqlEditor.value = queries[e.target.value] || '';
+                    }
+                });
+            }
+        }
+        
+        // === FONCTIONS POUR LA VUE PARAMÈTRES ===
+        function setupSettingsListeners() {
+            console.log('Setup settings listeners');
+            // Boutons de thème
+            const themeButtons = document.querySelectorAll('[id*="theme"]');
+            themeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    themeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    console.log('Thème changé:', btn.id);
+                    
+                    let themeName = '';
+                    if (btn.id.includes('Commander')) themeName = 'SGC-Commander';
+                    else if (btn.id.includes('Dark')) themeName = 'Sombre classique';
+                    else if (btn.id.includes('Light')) themeName = 'Clair';
+                    
+                    showAPIMessage(`Thème "${themeName}" activé !`, 'success');
+                });
+            });
+            
+            // Boutons d'action
+            const regenerateApiBtn = document.getElementById('regenerateApiBtn');
+            if (regenerateApiBtn) {
+                regenerateApiBtn.addEventListener('click', async () => {
+                    if (confirm('Regénérer la clé API ? Cela invalidera la clé actuelle.')) {
+                        console.log('Regénération clé API');
+                        await sendAPIMessage('Régénère une nouvelle clé API de sécurité');
+                    }
+                });
+            }
+            
+            const exportConfigBtn = document.getElementById('exportConfigBtn');
+            if (exportConfigBtn) {
+                exportConfigBtn.addEventListener('click', async () => {
+                    console.log('Export configuration');
+                    await sendAPIMessage('Exporte la configuration actuelle vers un fichier sgc-config.json');
+                });
+            }
+            
+            const importConfigBtn = document.getElementById('importConfigBtn');
+            if (importConfigBtn) {
+                importConfigBtn.addEventListener('click', async () => {
+                    console.log('Import configuration');
+                    await sendAPIMessage('Importe une configuration depuis un fichier sgc-config.json');
+                });
+            }
+            
+            const clearLogsBtn = document.getElementById('clearLogsBtn');
+            if (clearLogsBtn) {
+                clearLogsBtn.addEventListener('click', async () => {
+                    if (confirm('Vider tous les logs système ?')) {
+                        console.log('Vidage des logs');
+                        await sendAPIMessage('Vide tous les logs système et fichiers temporaires');
+                    }
+                });
+            }
+            
+            const restartServerBtn = document.getElementById('restartServerBtn');
+            if (restartServerBtn) {
+                restartServerBtn.addEventListener('click', async () => {
+                    if (confirm('Redémarrer le serveur SGC-AgentOne ?')) {
+                        console.log('Redémarrage serveur');
+                        await sendAPIMessage('Redémarre le serveur SGC-AgentOne');
+                    }
+                });
+            }
+            
+            // Gestion des checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    console.log('Option changée:', e.target.nextElementSibling.textContent, 'Activé:', e.target.checked);
+                });
+            });
         }
     </script>
 </body>
