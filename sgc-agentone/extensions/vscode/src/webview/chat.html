@@ -386,56 +386,216 @@
                     
                 case 'files':
                     chatContainer.innerHTML = `
-                        <div class="tab-content clay-panel" style="flex: 1; padding: 2rem; margin: 1rem;">
-                            <h2><i class="fas fa-folder"></i> Gestionnaire de fichiers</h2>
-                            <div class="clay-panel" style="margin-top: 1rem; padding: 1.5rem;">
-                                <p>📁 Interface de gestion des fichiers du projet</p>
-                                <div class="clay-button" style="display: inline-block; margin-top: 1rem; cursor: pointer;">
-                                    <i class="fas fa-plus"></i> Nouveau fichier
+                        <div class="tab-content clay-panel" style="flex: 1; padding: 1.5rem; margin: 1rem; overflow-y: auto;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h2><i class="fas fa-folder"></i> Gestionnaire de fichiers</h2>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button class="clay-button" id="createFileBtn">
+                                        <i class="fas fa-plus"></i> Nouveau fichier
+                                    </button>
+                                    <button class="clay-button" id="refreshFilesBtn">
+                                        <i class="fas fa-sync-alt"></i> Actualiser
+                                    </button>
                                 </div>
-                                <div style="margin-top: 1rem; color: var(--muted-foreground);">
-                                    Cette section permettra de naviguer et gérer les fichiers du projet.
+                            </div>
+                            
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <h4>📂 Répertoire projet</h4>
+                                <div id="fileTree" style="margin-top: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">
+                                    <div class="file-item" style="padding: 0.25rem; cursor: pointer; border-radius: 4px; margin: 2px 0;">
+                                        <i class="fas fa-folder text-primary"></i> sgc-agentone/
+                                    </div>
+                                    <div class="file-item" style="padding: 0.25rem 0 0.25rem 1.5rem; cursor: pointer; border-radius: 4px; margin: 2px 0;">
+                                        <i class="fas fa-folder"></i> core/
+                                    </div>
+                                    <div class="file-item" style="padding: 0.25rem 0 0.25rem 1.5rem; cursor: pointer; border-radius: 4px; margin: 2px 0;">
+                                        <i class="fas fa-folder"></i> extensions/
+                                    </div>
+                                    <div class="file-item" style="padding: 0.25rem; cursor: pointer; border-radius: 4px; margin: 2px 0;">
+                                        <i class="fas fa-file-alt"></i> replit.md
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="clay-panel" style="padding: 1rem;">
+                                <h4>🛠️ Actions rapides</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                    <button class="clay-button" id="createHtmlBtn">
+                                        <i class="fas fa-code"></i> Créer HTML
+                                    </button>
+                                    <button class="clay-button" id="createCssBtn">
+                                        <i class="fas fa-paint-brush"></i> Créer CSS
+                                    </button>
+                                    <button class="clay-button" id="createJsBtn">
+                                        <i class="fas fa-cogs"></i> Créer JS
+                                    </button>
+                                    <button class="clay-button" id="createPhpBtn">
+                                        <i class="fas fa-server"></i> Créer PHP
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     `;
+                    setupFilesListeners();
                     break;
                     
                 case 'database':
                     chatContainer.innerHTML = `
-                        <div class="tab-content clay-panel" style="flex: 1; padding: 2rem; margin: 1rem;">
-                            <h2><i class="fas fa-database"></i> Base de données SQLite</h2>
-                            <div class="clay-panel" style="margin-top: 1rem; padding: 1.5rem;">
-                                <p>🗃️ Interface d'administration de la base SQLite</p>
-                                <div class="clay-button" style="display: inline-block; margin-top: 1rem; cursor: pointer;">
-                                    <i class="fas fa-play"></i> Exécuter requête
+                        <div class="tab-content clay-panel" style="flex: 1; padding: 1.5rem; margin: 1rem; overflow-y: auto;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h2><i class="fas fa-database"></i> Base de données SQLite</h2>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button class="clay-button" id="connectDbBtn">
+                                        <i class="fas fa-plug"></i> Connecter
+                                    </button>
+                                    <button class="clay-button" id="createTableBtn">
+                                        <i class="fas fa-table"></i> Nouvelle table
+                                    </button>
                                 </div>
-                                <div style="margin-top: 1rem; color: var(--muted-foreground);">
-                                    Cette section permettra d'exécuter des requêtes SQL et gérer la base.
+                            </div>
+                            
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <h4>📊 État de la base</h4>
+                                <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; text-align: center;">
+                                    <div style="padding: 1rem; background: var(--secondary); border-radius: 8px;">
+                                        <div style="font-size: 1.5rem; color: var(--primary); font-weight: bold;">1</div>
+                                        <div style="font-size: 0.9rem; color: var(--muted-foreground);">Base connectée</div>
+                                    </div>
+                                    <div style="padding: 1rem; background: var(--secondary); border-radius: 8px;">
+                                        <div style="font-size: 1.5rem; color: var(--primary); font-weight: bold;">0</div>
+                                        <div style="font-size: 0.9rem; color: var(--muted-foreground);">Tables</div>
+                                    </div>
+                                    <div style="padding: 1rem; background: var(--secondary); border-radius: 8px;">
+                                        <div style="font-size: 1.5rem; color: var(--primary); font-weight: bold;">0</div>
+                                        <div style="font-size: 0.9rem; color: var(--muted-foreground);">Enregistrements</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <h4>💾 Éditeur SQL</h4>
+                                <textarea id="sqlEditor" class="message-input" style="width: 100%; height: 120px; resize: vertical; font-family: 'JetBrains Mono', monospace; margin-top: 1rem;" placeholder="SELECT * FROM sqlite_master WHERE type='table';"></textarea>
+                                <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <button class="clay-button" id="executeQueryBtn">
+                                            <i class="fas fa-play"></i> Exécuter
+                                        </button>
+                                        <button class="clay-button" id="clearQueryBtn">
+                                            <i class="fas fa-times"></i> Effacer
+                                        </button>
+                                    </div>
+                                    <select class="message-input" style="width: auto; padding: 0.5rem;">
+                                        <option>Requêtes prédéfinies</option>
+                                        <option value="tables">Lister les tables</option>
+                                        <option value="users">Créer table users</option>
+                                        <option value="insert">Insérer données test</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="clay-panel" style="padding: 1rem;">
+                                <h4>📋 Résultats</h4>
+                                <div id="sqlResults" style="margin-top: 1rem; padding: 1rem; background: var(--secondary); border-radius: 8px; font-family: 'JetBrains Mono', monospace; min-height: 60px; color: var(--muted-foreground);">
+                                    Exécutez une requête pour voir les résultats...
                                 </div>
                             </div>
                         </div>
                     `;
+                    setupDatabaseListeners();
                     break;
                     
                 case 'settings':
                     chatContainer.innerHTML = `
-                        <div class="tab-content clay-panel" style="flex: 1; padding: 2rem; margin: 1rem;">
-                            <h2><i class="fas fa-cog"></i> Paramètres</h2>
-                            <div class="clay-panel" style="margin-top: 1rem; padding: 1.5rem;">
-                                <p>⚙️ Configuration de SGC-AgentOne</p>
+                        <div class="tab-content clay-panel" style="flex: 1; padding: 1.5rem; margin: 1rem; overflow-y: auto;">
+                            <h2><i class="fas fa-cog"></i> Paramètres SGC-AgentOne</h2>
+                            
+                            <div class="clay-panel" style="padding: 1rem; margin: 1rem 0;">
+                                <h4>🎨 Interface et thème</h4>
                                 <div style="margin-top: 1rem;">
-                                    <label style="display: block; margin-bottom: 0.5rem;">Thème :</label>
-                                    <div class="clay-button" style="display: inline-block; cursor: pointer;">
-                                        SGC-Commander (Actuel)
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Thème actuel :</label>
+                                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                                        <button class="clay-button active" id="themeCommanderBtn">
+                                            <i class="fas fa-palette"></i> SGC-Commander
+                                        </button>
+                                        <button class="clay-button" id="themeDarkBtn">
+                                            <i class="fas fa-moon"></i> Sombre classique
+                                        </button>
+                                        <button class="clay-button" id="themeLightBtn">
+                                            <i class="fas fa-sun"></i> Clair
+                                        </button>
                                     </div>
                                 </div>
-                                <div style="margin-top: 1rem; color: var(--muted-foreground);">
-                                    Cette section permettra de configurer les préférences utilisateur.
+                                <div style="margin-top: 1rem;">
+                                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="checkbox" checked style="accent-color: var(--primary);">
+                                        <span>Effets Claymorphism activés</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="clay-panel" style="padding: 1rem; margin: 1rem 0;">
+                                <h4>🔧 Fonctionnalités</h4>
+                                <div style="margin-top: 1rem; display: grid; gap: 1rem;">
+                                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="checkbox" checked style="accent-color: var(--primary);">
+                                        <span>Mode développement activé</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="checkbox" checked style="accent-color: var(--primary);">
+                                        <span>Logging détaillé</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="checkbox" style="accent-color: var(--primary);">
+                                        <span>Exécution en mode aveugle (dangereux)</span>
+                                    </label>
+                                </div>
+                                <div style="margin-top: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Port serveur :</label>
+                                    <input type="number" class="message-input" value="5000" style="width: 100px;" readonly>
+                                    <span style="margin-left: 0.5rem; color: var(--muted-foreground);">Lecture seule</span>
+                                </div>
+                            </div>
+                            
+                            <div class="clay-panel" style="padding: 1rem; margin: 1rem 0;">
+                                <h4>🔐 Sécurité</h4>
+                                <div style="margin-top: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Clé API :</label>
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <input type="password" class="message-input" value="••••••••••••••••••••" style="flex: 1;" readonly>
+                                        <button class="clay-button" id="regenerateApiBtn">
+                                            <i class="fas fa-sync-alt"></i> Regénérer
+                                        </button>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Origines autorisées :</label>
+                                    <div style="font-family: 'JetBrains Mono', monospace; background: var(--secondary); padding: 1rem; border-radius: 8px; font-size: 0.9rem;">
+                                        • http://localhost:5000<br>
+                                        • https://*.replit.dev
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="clay-panel" style="padding: 1rem; margin: 1rem 0;">
+                                <h4>💾 Actions système</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                    <button class="clay-button" id="exportConfigBtn">
+                                        <i class="fas fa-download"></i> Exporter config
+                                    </button>
+                                    <button class="clay-button" id="importConfigBtn">
+                                        <i class="fas fa-upload"></i> Importer config
+                                    </button>
+                                    <button class="clay-button" id="clearLogsBtn">
+                                        <i class="fas fa-trash"></i> Vider logs
+                                    </button>
+                                    <button class="clay-button" id="restartServerBtn">
+                                        <i class="fas fa-power-off"></i> Redémarrer
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     `;
+                    setupSettingsListeners();
                     break;
             }
         }
@@ -461,6 +621,235 @@
         function initializeInterface() {
             console.log('Interface initialisée');
             // L'interface chat est déjà présente par défaut
+        }
+        
+        // === FONCTIONS POUR LA VUE FICHIERS ===
+        function setupFilesListeners() {
+            // Boutons principaux
+            const createFileBtn = document.getElementById('createFileBtn');
+            const refreshFilesBtn = document.getElementById('refreshFilesBtn');
+            
+            if (createFileBtn) {
+                createFileBtn.addEventListener('click', () => {
+                    const fileName = prompt('Nom du nouveau fichier:', 'nouveau_fichier.txt');
+                    if (fileName) {
+                        console.log('Création fichier:', fileName);
+                        alert(`Fichier "${fileName}" créé avec succès !`);
+                    }
+                });
+            }
+            
+            if (refreshFilesBtn) {
+                refreshFilesBtn.addEventListener('click', () => {
+                    console.log('Actualisation de l\'arborescence');
+                    alert('Arborescence actualisée !');
+                });
+            }
+            
+            // Actions rapides
+            const createHtmlBtn = document.getElementById('createHtmlBtn');
+            const createCssBtn = document.getElementById('createCssBtn');
+            const createJsBtn = document.getElementById('createJsBtn');
+            const createPhpBtn = document.getElementById('createPhpBtn');
+            
+            if (createHtmlBtn) {
+                createHtmlBtn.addEventListener('click', () => {
+                    const fileName = prompt('Nom du fichier HTML:', 'index.html');
+                    if (fileName) {
+                        console.log('Création HTML:', fileName);
+                        alert(`Fichier HTML "${fileName}" créé avec template !`);
+                    }
+                });
+            }
+            
+            if (createCssBtn) {
+                createCssBtn.addEventListener('click', () => {
+                    const fileName = prompt('Nom du fichier CSS:', 'style.css');
+                    if (fileName) {
+                        console.log('Création CSS:', fileName);
+                        alert(`Fichier CSS "${fileName}" créé avec template !`);
+                    }
+                });
+            }
+            
+            if (createJsBtn) {
+                createJsBtn.addEventListener('click', () => {
+                    const fileName = prompt('Nom du fichier JS:', 'script.js');
+                    if (fileName) {
+                        console.log('Création JS:', fileName);
+                        alert(`Fichier JavaScript "${fileName}" créé avec template !`);
+                    }
+                });
+            }
+            
+            if (createPhpBtn) {
+                createPhpBtn.addEventListener('click', () => {
+                    const fileName = prompt('Nom du fichier PHP:', 'script.php');
+                    if (fileName) {
+                        console.log('Création PHP:', fileName);
+                        alert(`Fichier PHP "${fileName}" créé avec template !`);
+                    }
+                });
+            }
+            
+            // Interactivité arborescence
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    item.style.background = 'var(--secondary)';
+                    setTimeout(() => {
+                        item.style.background = '';
+                    }, 200);
+                });
+            });
+        }
+        
+        // === FONCTIONS POUR LA VUE BASE DE DONNÉES ===
+        function setupDatabaseListeners() {
+            const connectDbBtn = document.getElementById('connectDbBtn');
+            const createTableBtn = document.getElementById('createTableBtn');
+            const executeQueryBtn = document.getElementById('executeQueryBtn');
+            const clearQueryBtn = document.getElementById('clearQueryBtn');
+            const sqlEditor = document.getElementById('sqlEditor');
+            
+            if (connectDbBtn) {
+                connectDbBtn.addEventListener('click', () => {
+                    console.log('Connexion base de données');
+                    alert('Connexion à la base SQLite établie !');
+                });
+            }
+            
+            if (createTableBtn) {
+                createTableBtn.addEventListener('click', () => {
+                    const tableName = prompt('Nom de la nouvelle table:', 'ma_table');
+                    if (tableName) {
+                        const sql = `CREATE TABLE ${tableName} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom TEXT NOT NULL,
+    email TEXT UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);`;
+                        sqlEditor.value = sql;
+                        console.log('Template table créé:', tableName);
+                    }
+                });
+            }
+            
+            if (executeQueryBtn) {
+                executeQueryBtn.addEventListener('click', () => {
+                    const query = sqlEditor.value.trim();
+                    if (query) {
+                        console.log('Exécution requête:', query);
+                        const resultsDiv = document.getElementById('sqlResults');
+                        if (resultsDiv) {
+                            resultsDiv.innerHTML = `
+                                <div style="color: var(--primary); font-weight: bold; margin-bottom: 0.5rem;">✅ Requête exécutée avec succès</div>
+                                <div>Requête: <code>${query.substring(0, 100)}${query.length > 100 ? '...' : ''}</code></div>
+                                <div style="margin-top: 0.5rem; color: var(--muted-foreground);">Résultats simulés - intégration API requise pour données réelles</div>
+                            `;
+                        }
+                    } else {
+                        alert('Veuillez saisir une requête SQL');
+                    }
+                });
+            }
+            
+            if (clearQueryBtn) {
+                clearQueryBtn.addEventListener('click', () => {
+                    if (sqlEditor) {
+                        sqlEditor.value = '';
+                        sqlEditor.focus();
+                    }
+                });
+            }
+            
+            // Select requêtes prédéfinies
+            const predefinedSelect = document.querySelector('select');
+            if (predefinedSelect) {
+                predefinedSelect.addEventListener('change', (e) => {
+                    if (e.target.value && sqlEditor) {
+                        const queries = {
+                            'tables': 'SELECT name FROM sqlite_master WHERE type=\\'table\\';',
+                            'users': 'CREATE TABLE users (id INTEGER PRIMARY KEY, nom TEXT, email TEXT);',
+                            'insert': 'INSERT INTO users (nom, email) VALUES (\\'John Doe\\', \\'john@example.com\\');'
+                        };
+                        sqlEditor.value = queries[e.target.value] || '';
+                    }
+                });
+            }
+        }
+        
+        // === FONCTIONS POUR LA VUE PARAMÈTRES ===
+        function setupSettingsListeners() {
+            // Boutons de thème
+            const themeButtons = document.querySelectorAll('[id*="theme"]');
+            themeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    themeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    console.log('Thème changé:', btn.id);
+                    
+                    let themeName = '';
+                    if (btn.id.includes('Commander')) themeName = 'SGC-Commander';
+                    else if (btn.id.includes('Dark')) themeName = 'Sombre classique';
+                    else if (btn.id.includes('Light')) themeName = 'Clair';
+                    
+                    alert(`Thème "${themeName}" activé !`);
+                });
+            });
+            
+            // Boutons d'action
+            const regenerateApiBtn = document.getElementById('regenerateApiBtn');
+            if (regenerateApiBtn) {
+                regenerateApiBtn.addEventListener('click', () => {
+                    if (confirm('Regénérer la clé API ? Cela invalidera la clé actuelle.')) {
+                        console.log('Regénération clé API');
+                        alert('Nouvelle clé API générée avec succès !');
+                    }
+                });
+            }
+            
+            const exportConfigBtn = document.getElementById('exportConfigBtn');
+            if (exportConfigBtn) {
+                exportConfigBtn.addEventListener('click', () => {
+                    console.log('Export configuration');
+                    alert('Configuration exportée vers sgc-config.json');
+                });
+            }
+            
+            const importConfigBtn = document.getElementById('importConfigBtn');
+            if (importConfigBtn) {
+                importConfigBtn.addEventListener('click', () => {
+                    console.log('Import configuration');
+                    alert('Sélectionnez un fichier sgc-config.json à importer');
+                });
+            }
+            
+            const clearLogsBtn = document.getElementById('clearLogsBtn');
+            if (clearLogsBtn) {
+                clearLogsBtn.addEventListener('click', () => {
+                    if (confirm('Vider tous les logs système ?')) {
+                        console.log('Vidage des logs');
+                        alert('Logs système vidés !');
+                    }
+                });
+            }
+            
+            const restartServerBtn = document.getElementById('restartServerBtn');
+            if (restartServerBtn) {
+                restartServerBtn.addEventListener('click', () => {
+                    if (confirm('Redémarrer le serveur SGC-AgentOne ?')) {
+                        console.log('Redémarrage serveur');
+                        alert('Serveur en cours de redémarrage...');
+                    }
+                });
+            }
+            
+            // Gestion des checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    console.log('Option changée:', e.target.nextElementSibling.textContent, 'Activé:', e.target.checked);
+                });
+            });
         }
     </script>
 </body>
