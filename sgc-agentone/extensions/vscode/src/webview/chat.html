@@ -310,6 +310,145 @@
             }
         });
         
+        // Event listeners pour les boutons de navigation
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Supprimer la classe active de tous les boutons
+                document.querySelectorAll('.nav-button').forEach(b => 
+                    b.classList.remove('active'));
+                
+                // Ajouter la classe active au bouton cliqué
+                this.classList.add('active');
+                
+                // Gérer l'affichage selon l'onglet
+                const tab = this.dataset.tab;
+                handleTabSwitch(tab);
+            });
+        });
+
+        function handleTabSwitch(tab) {
+            const chatContainer = document.querySelector('.chat-container');
+            
+            switch(tab) {
+                case 'chat':
+                    chatContainer.innerHTML = `
+                        <div class="messages" id="messages">
+                            <div class="message ai clay-panel">
+                                <div>👋 Bonjour ! Je suis SGC-AgentOne, votre assistant IA.</div>
+                                <div style="margin-top: 0.5rem;">Vous pouvez me demander de :</div>
+                                <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                    <li>Créer des fichiers (HTML, CSS, JS, PHP, JSON...)</li>
+                                    <li>Modifier des fichiers existants</li>
+                                    <li>Lire le contenu de fichiers</li>
+                                    <li>Créer et gérer une base SQLite</li>
+                                    <li>Exécuter des requêtes SQL</li>
+                                </ul>
+                                <div style="margin-top: 0.5rem;">Essayez : <em>"Crée un fichier index.html avec une page d'accueil"</em></div>
+                                
+                                <!-- Démonstration de la coloration syntaxique -->
+                                <div class="syntax-demo clay-panel" style="margin-top: 1rem;">
+                                    <div style="margin-bottom: 0.5rem; font-weight: 600;">🎨 Démonstration de la coloration syntaxique :</div>
+                                    <code>
+<span class="syntax-php">&lt;?php</span>
+<span class="syntax-keyword">function</span> <span class="syntax-php">greeting</span>(<span class="syntax-keyword">string</span> <span class="syntax-php">$name</span>) {
+    <span class="syntax-keyword">return</span> <span class="syntax-string">"Hello " . $name . "!"</span>; <span class="syntax-comment">// Message de bienvenue</span>
+}
+
+<span class="syntax-php">$count</span> = <span class="syntax-number">42</span>;
+<span class="syntax-keyword">echo</span> <span class="syntax-string">"<span class="syntax-html">&lt;h1&gt;</span>SGC-AgentOne<span class="syntax-html">&lt;/h1&gt;</span>"</span>;
+<span class="syntax-php">?&gt;</span>
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-container clay-panel">
+                            <input 
+                                type="text" 
+                                class="message-input" 
+                                id="messageInput" 
+                                placeholder="Tapez votre message ici..."
+                                autocomplete="off"
+                            >
+                            <button class="send-button clay-button" id="sendButton">Envoyer</button>
+                        </div>
+                    `;
+                    setupChatListeners();
+                    break;
+                    
+                case 'files':
+                    chatContainer.innerHTML = `
+                        <div class="tab-content clay-panel" style="flex: 1; padding: 2rem; margin: 1rem;">
+                            <h2><i class="fas fa-folder"></i> Gestionnaire de fichiers</h2>
+                            <div class="clay-panel" style="margin-top: 1rem; padding: 1.5rem;">
+                                <p>📁 Interface de gestion des fichiers du projet</p>
+                                <div class="clay-button" style="display: inline-block; margin-top: 1rem; cursor: pointer;">
+                                    <i class="fas fa-plus"></i> Nouveau fichier
+                                </div>
+                                <div style="margin-top: 1rem; color: var(--muted-foreground);">
+                                    Cette section permettra de naviguer et gérer les fichiers du projet.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'database':
+                    chatContainer.innerHTML = `
+                        <div class="tab-content clay-panel" style="flex: 1; padding: 2rem; margin: 1rem;">
+                            <h2><i class="fas fa-database"></i> Base de données SQLite</h2>
+                            <div class="clay-panel" style="margin-top: 1rem; padding: 1.5rem;">
+                                <p>🗃️ Interface d'administration de la base SQLite</p>
+                                <div class="clay-button" style="display: inline-block; margin-top: 1rem; cursor: pointer;">
+                                    <i class="fas fa-play"></i> Exécuter requête
+                                </div>
+                                <div style="margin-top: 1rem; color: var(--muted-foreground);">
+                                    Cette section permettra d'exécuter des requêtes SQL et gérer la base.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'settings':
+                    chatContainer.innerHTML = `
+                        <div class="tab-content clay-panel" style="flex: 1; padding: 2rem; margin: 1rem;">
+                            <h2><i class="fas fa-cog"></i> Paramètres</h2>
+                            <div class="clay-panel" style="margin-top: 1rem; padding: 1.5rem;">
+                                <p>⚙️ Configuration de SGC-AgentOne</p>
+                                <div style="margin-top: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem;">Thème :</label>
+                                    <div class="clay-button" style="display: inline-block; cursor: pointer;">
+                                        SGC-Commander (Actuel)
+                                    </div>
+                                </div>
+                                <div style="margin-top: 1rem; color: var(--muted-foreground);">
+                                    Cette section permettra de configurer les préférences utilisateur.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+
+        function setupChatListeners() {
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            
+            if (sendButton) {
+                sendButton.addEventListener('click', sendMessage);
+            }
+            if (messageInput) {
+                messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+                messageInput.focus();
+            }
+        }
+
         // Focus sur l'input au chargement
         messageInput.focus();
     </script>
