@@ -1,0 +1,10 @@
+{
+    "webview_e54663947db43423768a9035d3813e70_1757711627": {
+        "created": 1757711627,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
+    }
+}
