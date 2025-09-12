@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGC-AgentOne Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0e27;
+            color: #e2e8f0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: #1e293b;
+            padding: 1rem;
+            border-bottom: 1px solid #334155;
+            text-align: center;
+        }
+        
+        .logo {
+            color: #06b6d4;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .message {
+            padding: 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+        
+        .message.user {
+            background: linear-gradient(145deg, #1e40af, #1d4ed8);
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .message.ai {
+            background: linear-gradient(145deg, #374151, #4b5563);
+            align-self: flex-start;
+        }
+        
+        .input-container {
+            padding: 1rem;
+            background: #1e293b;
+            border-top: 1px solid #334155;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 0.75rem;
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+        
+        .message-input:focus {
+            outline: none;
+            border-color: #06b6d4;
+        }
+        
+        .send-button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(145deg, #06b6d4, #0891b2);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .send-button:hover {
+            background: linear-gradient(145deg, #0891b2, #0e7490);
+        }
+        
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🤖 SGC-AgentOne</div>
+        <div class="status">Assistant IA pour la création de fichiers</div>
+    </div>
+    
+    <div class="chat-container">
+        <div class="messages" id="messages">
+            <div class="message ai">
+                <div>👋 Bonjour ! Je suis SGC-AgentOne, votre assistant IA.</div>
+                <div style="margin-top: 0.5rem;">Vous pouvez me demander de :</div>
+                <ul style="margin: 0.5rem 0 0 1.5rem;">
+                    <li>Créer des fichiers (HTML, CSS, JS, PHP, JSON...)</li>
+                    <li>Modifier des fichiers existants</li>
+                    <li>Lire le contenu de fichiers</li>
+                    <li>Créer et gérer une base SQLite</li>
+                    <li>Exécuter des requêtes SQL</li>
+                </ul>
+                <div style="margin-top: 0.5rem;">Essayez : <em>"Crée un fichier index.html avec une page d'accueil"</em></div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input 
+                type="text" 
+                class="message-input" 
+                id="messageInput" 
+                placeholder="Tapez votre message ici..."
+                autocomplete="off"
+            >
+            <button class="send-button" id="sendButton">Envoyer</button>
+        </div>
+    </div>
+
+    <script>
+        const messagesContainer = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            messageDiv.innerHTML = content;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Afficher le message utilisateur
+            addMessage(message, true);
+            messageInput.value = '';
+            sendButton.disabled = true;
+            sendButton.textContent = 'Envoi...';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': 'sgc-agent-dev-key-2024'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        projectPath: '.',
+                        blind: false
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    addMessage(`❌ Erreur: ${data.error}`);
+                } else {
+                    addMessage(data.response || '✅ Action effectuée');
+                    
+                    // Afficher les actions si présentes
+                    if (data.actions && data.actions.length > 0) {
+                        const actionsText = data.actions.map(action => 
+                            `• ${action.action}: ${action.result}`
+                        ).join('<br>');
+                        addMessage(`<strong>Actions:</strong><br>${actionsText}`);
+                    }
+                }
+                
+            } catch (error) {
+                addMessage(`❌ Erreur de connexion: ${error.message}`);
+            }
+            
+            sendButton.disabled = false;
+            sendButton.textContent = 'Envoyer';
+            messageInput.focus();
+        }
+        
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Focus sur l'input au chargement
+        messageInput.focus();
+    </script>
+</body>
+</html>

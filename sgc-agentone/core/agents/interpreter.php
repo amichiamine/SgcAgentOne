@@ -1,0 +1,177 @@
+<?php
+/**
+ * SGC-AgentOne - Interpréteur de langage naturel
+ * Traduit les phrases utilisateur en commandes internes
+ * Supporte français et anglais
+ */
+
+/**
+ * Interprète un message utilisateur
+ * @param string $message
+ * @return array|false ['action' => string, 'params' => array]
+ */
+function interpretMessage($message) {
+    $projectRoot = getcwd();
+    $rulesFile = $projectRoot . '/sgc-agentone/core/config/rules.json';
+    
+    // Chargement des règles
+    if (!file_exists($rulesFile)) {
+        return false;
+    }
+    
+    $rules = json_decode(file_get_contents($rulesFile), true);
+    if (!$rules) {
+        return false;
+    }
+    
+    $message = trim(strtolower($message));
+    
+    // Recherche de correspondance avec les patterns
+    foreach ($rules as $rule) {
+        if (matchesPattern($message, $rule['pattern'])) {
+            $params = extractParams($message, $rule['pattern'], $rule['action']);
+            return [
+                'action' => $rule['action'],
+                'params' => $params
+            ];
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * Vérifie si un message correspond à un pattern
+ */
+function matchesPattern($message, $pattern) {
+    $pattern = strtolower($pattern);
+    
+    // Patterns avec wildcards
+    if (strpos($pattern, '*') !== false) {
+        $regex = '/' . str_replace('*', '.*', preg_quote($pattern, '/')) . '/';
+        return preg_match($regex, $message);
+    }
+    
+    // Recherche de mots-clés
+    $keywords = explode(' ', $pattern);
+    $matchCount = 0;
+    
+    foreach ($keywords as $keyword) {
+        if (strpos($message, trim($keyword)) !== false) {
+            $matchCount++;
+        }
+    }
+    
+    // Au moins 50% des mots-clés doivent correspondre
+    return $matchCount >= ceil(count($keywords) * 0.5);
+}
+
+/**
+ * Extrait les paramètres du message selon l'action
+ */
+function extractParams($message, $pattern, $action) {
+    $params = [];
+    
+    switch ($action) {
+        case 'create file':
+            $params = extractFileParams($message, 'create');
+            break;
+            
+        case 'update file':
+            $params = extractFileParams($message, 'update');
+            break;
+            
+        case 'read file':
+            $params = extractFileParams($message, 'read');
+            break;
+            
+        case 'execute query':
+            $params = extractQueryParams($message);
+            break;
+            
+        case 'create database':
+            $params = ['name' => 'app.db'];
+            break;
+            
+        default:
+            $params = ['raw_message' => $message];
+    }
+    
+    return $params;
+}
+
+/**
+ * Extrait les paramètres liés aux fichiers
+ */
+function extractFileParams($message, $operation) {
+    $params = [];
+    
+    // Recherche de nom de fichier
+    if (preg_match('/(?:fichier|file)\s+([a-zA-Z0-9\-_\.\/]+)/', $message, $matches)) {
+        $params['filename'] = $matches[1];
+    } elseif (preg_match('/([a-zA-Z0-9\-_\.\/]+\.[a-zA-Z]+)/', $message, $matches)) {
+        $params['filename'] = $matches[1];
+    }
+    
+    // Extraction de contenu pour création/modification
+    if ($operation === 'create' || $operation === 'update') {
+        if (preg_match('/(?:contenu|content|avec)\s+"([^"]+)"/', $message, $matches)) {
+            $params['content'] = $matches[1];
+        } elseif (preg_match('/(?:contenu|content|avec)\s+(.+)/', $message, $matches)) {
+            $params['content'] = trim($matches[1]);
+        }
+        
+        // Détection du type de fichier
+        if (isset($params['filename'])) {
+            $ext = pathinfo($params['filename'], PATHINFO_EXTENSION);
+            $params['type'] = $ext;
+            
+            // Contenu par défaut selon le type
+            if (!isset($params['content'])) {
+                $params['content'] = getDefaultContent($ext);
+            }
+        }
+    }
+    
+    return $params;
+}
+
+/**
+ * Extrait les paramètres de requête SQL
+ */
+function extractQueryParams($message) {
+    $params = [];
+    
+    // Recherche de requête SQL directe
+    if (preg_match('/(SELECT|INSERT|UPDATE|CREATE|DELETE)\s+.+/i', $message, $matches)) {
+        $params['query'] = $matches[0];
+    } else {
+        // Génération de requête basée sur l'intention
+        if (strpos($message, 'table') !== false && strpos($message, 'crée') !== false) {
+            if (preg_match('/table\s+([a-zA-Z_]+)/', $message, $matches)) {
+                $tableName = $matches[1];
+                $params['query'] = "CREATE TABLE IF NOT EXISTS {$tableName} (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)";
+            }
+        }
+    }
+    
+    return $params;
+}
+
+/**
+ * Retourne le contenu par défaut selon le type de fichier
+ */
+function getDefaultContent($extension) {
+    $templates = [
+        'html' => '<!DOCTYPE html><html><head><title>Page</title></head><body><h1>Contenu</h1></body></html>',
+        'css' => '/* Styles CSS */\nbody { margin: 0; padding: 0; }',
+        'js' => '// JavaScript\nconsole.log("Hello World");',
+        'php' => '<?php\n// PHP Code\necho "Hello World";\n?>',
+        'json' => '{\n  "name": "config",\n  "version": "1.0.0"\n}',
+        'txt' => 'Contenu texte',
+        'md' => '# Titre\n\nContenu markdown.'
+    ];
+    
+    return $templates[$extension] ?? '';
+}
+?>

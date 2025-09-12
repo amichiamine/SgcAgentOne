@@ -1,0 +1,10 @@
+{
+  "port": 5000,
+  "blind_exec_enabled": false,
+  "project_root": ".",
+  "security": {
+    "api_key": "sgc-agent-dev-key-2024",
+    "allowed_origins": ["http://localhost:5000", "https://*.replit.dev"],
+    "require_auth": true
+  }
+}
