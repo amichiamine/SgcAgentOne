@@ -209,11 +209,13 @@
     </div>
 
     <script>
-        const messagesContainer = document.getElementById('messages');
-        const messageInput = document.getElementById('messageInput');
-        const sendButton = document.getElementById('sendButton');
+        // Variables globales
+        let messagesContainer, messageInput, sendButton;
         
         function addMessage(content, isUser = false) {
+            const messagesContainer = document.getElementById('messages');
+            if (!messagesContainer) return;
+            
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'ai clay-panel'}`;
             messageDiv.innerHTML = content;
@@ -303,28 +305,34 @@
             messageInput.focus();
         }
         
-        sendButton.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+        // Initialisation après chargement du DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            setupInitialListeners();
+            initializeInterface();
         });
-        
-        // Event listeners pour les boutons de navigation
-        document.querySelectorAll('.nav-button').forEach(button => {
-            button.addEventListener('click', function() {
-                // Supprimer la classe active de tous les boutons
-                document.querySelectorAll('.nav-button').forEach(b => 
-                    b.classList.remove('active'));
-                
-                // Ajouter la classe active au bouton cliqué
-                this.classList.add('active');
-                
-                // Gérer l'affichage selon l'onglet
-                const tab = this.dataset.tab;
-                handleTabSwitch(tab);
+
+        function setupInitialListeners() {
+            // Event listeners pour les boutons de navigation
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    console.log('Bouton cliqué:', this.dataset.tab);
+                    
+                    // Supprimer la classe active de tous les boutons
+                    document.querySelectorAll('.nav-button').forEach(b => 
+                        b.classList.remove('active'));
+                    
+                    // Ajouter la classe active au bouton cliqué
+                    this.classList.add('active');
+                    
+                    // Gérer l'affichage selon l'onglet
+                    const tab = this.dataset.tab;
+                    handleTabSwitch(tab);
+                });
             });
-        });
+            
+            // Setup initial chat listeners
+            setupChatListeners();
+        }
 
         function handleTabSwitch(tab) {
             const chatContainer = document.querySelector('.chat-container');
@@ -438,6 +446,7 @@
             
             if (sendButton) {
                 sendButton.addEventListener('click', sendMessage);
+                console.log('Send button listener ajouté');
             }
             if (messageInput) {
                 messageInput.addEventListener('keypress', (e) => {
@@ -445,12 +454,14 @@
                         sendMessage();
                     }
                 });
-                messageInput.focus();
+                setTimeout(() => messageInput.focus(), 100);
             }
         }
-
-        // Focus sur l'input au chargement
-        messageInput.focus();
+        
+        function initializeInterface() {
+            console.log('Interface initialisée');
+            // L'interface chat est déjà présente par défaut
+        }
     </script>
 </body>
 </html>
