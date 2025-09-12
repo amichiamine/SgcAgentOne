@@ -924,6 +924,66 @@
             }
         }
         
+        // === DÉFINITIONS DES THÈMES ===
+        const themes = {
+            commander: {
+                name: 'SGC-Commander',
+                vars: {
+                    '--background': 'hsl(222, 84%, 5%)',
+                    '--foreground': 'hsl(210, 40%, 95%)',
+                    '--card': 'hsl(215, 28%, 17%)',
+                    '--primary': 'hsl(188, 95%, 42%)',
+                    '--primary-foreground': 'hsl(222, 84%, 5%)',
+                    '--secondary': 'hsl(215, 16%, 25%)',
+                    '--accent': 'hsl(188, 95%, 42%)',
+                    '--border': 'hsl(217, 19%, 20%)',
+                    '--muted-foreground': 'hsl(217, 10%, 58%)'
+                }
+            },
+            dark: {
+                name: 'Sombre classique',
+                vars: {
+                    '--background': 'hsl(0, 0%, 8%)',
+                    '--foreground': 'hsl(0, 0%, 95%)',
+                    '--card': 'hsl(0, 0%, 14%)',
+                    '--primary': 'hsl(210, 95%, 50%)',
+                    '--primary-foreground': 'hsl(0, 0%, 98%)',
+                    '--secondary': 'hsl(0, 0%, 20%)',
+                    '--accent': 'hsl(210, 95%, 50%)',
+                    '--border': 'hsl(0, 0%, 25%)',
+                    '--muted-foreground': 'hsl(0, 0%, 65%)'
+                }
+            },
+            light: {
+                name: 'Clair',
+                vars: {
+                    '--background': 'hsl(0, 0%, 98%)',
+                    '--foreground': 'hsl(0, 0%, 5%)',
+                    '--card': 'hsl(0, 0%, 95%)',
+                    '--primary': 'hsl(210, 95%, 45%)',
+                    '--primary-foreground': 'hsl(0, 0%, 98%)',
+                    '--secondary': 'hsl(0, 0%, 90%)',
+                    '--accent': 'hsl(210, 95%, 45%)',
+                    '--border': 'hsl(0, 0%, 85%)',
+                    '--muted-foreground': 'hsl(0, 0%, 45%)'
+                }
+            }
+        };
+        
+        // === FONCTION D'APPLICATION DES THÈMES ===
+        function applyTheme(themeKey) {
+            const theme = themes[themeKey];
+            if (!theme) return;
+            
+            const root = document.documentElement;
+            Object.entries(theme.vars).forEach(([prop, value]) => {
+                root.style.setProperty(prop, value);
+            });
+            
+            console.log(`Thème appliqué: ${theme.name}`);
+            showAPIMessage(`Thème "${theme.name}" activé !`, 'success');
+        }
+
         // === FONCTIONS POUR LA VUE PARAMÈTRES ===
         function setupSettingsListeners() {
             console.log('Setup settings listeners');
@@ -935,12 +995,14 @@
                     btn.classList.add('active');
                     console.log('Thème changé:', btn.id);
                     
-                    let themeName = '';
-                    if (btn.id.includes('Commander')) themeName = 'SGC-Commander';
-                    else if (btn.id.includes('Dark')) themeName = 'Sombre classique';
-                    else if (btn.id.includes('Light')) themeName = 'Clair';
-                    
-                    showAPIMessage(`Thème "${themeName}" activé !`, 'success');
+                    // Appliquer le thème correspondant
+                    if (btn.id.includes('Commander')) {
+                        applyTheme('commander');
+                    } else if (btn.id.includes('Dark')) {
+                        applyTheme('dark');
+                    } else if (btn.id.includes('Light')) {
+                        applyTheme('light');
+                    }
                 });
             });
             
