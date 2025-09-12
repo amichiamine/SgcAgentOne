@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}}</title>
+    <link rel="stylesheet" href="{{BASE_URL}}/sgc-agentone/core/templates/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="clay-panel">
+            <h1>{{TITLE}}</h1>
+            <div class="content clay-panel">
+                {{CONTENT}}
+            </div>
+            
+            <!-- Containers pour les réponses et erreurs -->
+            <div class="response-display"></div>
+            <div class="error-display"></div>
+            
+            <!-- Actions et formulaires -->
+            <div class="actions-container">
+                {{ACTIONS}}
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{BASE_URL}}/sgc-agentone/core/templates/js/script.js"></script>
+    <script>
+        // Configuration spécifique à la page
+        if (typeof SGCAgent !== 'undefined') {
+            SGCAgent.pageConfig = {
+                title: '{{TITLE}}',
+                apiUrl: '{{API_URL}}',
+                baseUrl: '{{BASE_URL}}'
+            };
+        }
+    </script>
+</body>
+</html>

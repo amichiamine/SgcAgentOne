@@ -1,8 +1,11 @@
 <?php
 /**
  * Action: Création de fichier
- * Crée un fichier avec contenu optionnel
+ * Crée un fichier avec contenu optionnel et support des templates
  */
+
+// Inclusion de l'utilitaire de rendu de templates
+require_once getcwd() . '/sgc-agentone/core/utils/TemplateRenderer.php';
 
 function executeAction_createfile($params, $projectPath) {
     if (!isset($params['filename'])) {
@@ -11,6 +14,20 @@ function executeAction_createfile($params, $projectPath) {
     
     $filename = $params['filename'];
     $content = $params['content'] ?? '';
+    $template = $params['template'] ?? null;
+    $variables = $params['variables'] ?? [];
+    
+    // Si un template est spécifié, l'utiliser pour générer le contenu
+    if ($template && empty($content)) {
+        $renderedContent = TemplateRenderer::quickRenderFile($template, $variables);
+        if ($renderedContent === false) {
+            return ['success' => false, 'error' => 'Template non trouvé ou erreur de rendu: ' . $template];
+        }
+        $content = $renderedContent;
+    } elseif (!empty($content) && !empty($variables)) {
+        // Si des variables sont fournies avec du contenu, effectuer le rendu
+        $content = TemplateRenderer::quickRender($content, $variables);
+    }
     
     // Sécurisation du chemin
     if (strpos($filename, '..') !== false || strpos($filename, '\\') !== false) {
@@ -34,9 +51,18 @@ function executeAction_createfile($params, $projectPath) {
         return ['success' => false, 'error' => 'Impossible d\'écrire le fichier'];
     }
     
+    $fileSize = strlen($content);
+    $templateInfo = $template ? " à partir du template {$template}" : '';
+    
     return [
         'success' => true,
-        'response' => "✅ Fichier créé: {$filename} (" . strlen($content) . " caractères)"
+        'response' => "✅ Fichier créé: {$filename}{$templateInfo} ({$fileSize} caractères)",
+        'details' => [
+            'filename' => $filename,
+            'size' => $fileSize,
+            'template_used' => $template,
+            'variables_count' => count($variables)
+        ]
     ];
 }
 ?>
