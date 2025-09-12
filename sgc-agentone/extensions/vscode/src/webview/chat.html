@@ -625,24 +625,25 @@
         
         // === FONCTIONS POUR LA VUE FICHIERS ===
         function setupFilesListeners() {
+            console.log('Setup files listeners');
+            
             // Boutons principaux
             const createFileBtn = document.getElementById('createFileBtn');
             const refreshFilesBtn = document.getElementById('refreshFilesBtn');
             
             if (createFileBtn) {
-                createFileBtn.addEventListener('click', () => {
+                createFileBtn.addEventListener('click', async () => {
                     const fileName = prompt('Nom du nouveau fichier:', 'nouveau_fichier.txt');
                     if (fileName) {
-                        console.log('Création fichier:', fileName);
-                        alert(`Fichier "${fileName}" créé avec succès !`);
+                        await createFileViaAPI(fileName, 'Créer un nouveau fichier');
                     }
                 });
             }
             
             if (refreshFilesBtn) {
-                refreshFilesBtn.addEventListener('click', () => {
+                refreshFilesBtn.addEventListener('click', async () => {
                     console.log('Actualisation de l\'arborescence');
-                    alert('Arborescence actualisée !');
+                    await sendAPIMessage('Actualise la liste des fichiers du projet');
                 });
             }
             
@@ -653,41 +654,37 @@
             const createPhpBtn = document.getElementById('createPhpBtn');
             
             if (createHtmlBtn) {
-                createHtmlBtn.addEventListener('click', () => {
+                createHtmlBtn.addEventListener('click', async () => {
                     const fileName = prompt('Nom du fichier HTML:', 'index.html');
                     if (fileName) {
-                        console.log('Création HTML:', fileName);
-                        alert(`Fichier HTML "${fileName}" créé avec template !`);
+                        await createFileViaAPI(fileName, 'Créer un fichier HTML avec template de base');
                     }
                 });
             }
             
             if (createCssBtn) {
-                createCssBtn.addEventListener('click', () => {
+                createCssBtn.addEventListener('click', async () => {
                     const fileName = prompt('Nom du fichier CSS:', 'style.css');
                     if (fileName) {
-                        console.log('Création CSS:', fileName);
-                        alert(`Fichier CSS "${fileName}" créé avec template !`);
+                        await createFileViaAPI(fileName, 'Créer un fichier CSS avec template de base');
                     }
                 });
             }
             
             if (createJsBtn) {
-                createJsBtn.addEventListener('click', () => {
+                createJsBtn.addEventListener('click', async () => {
                     const fileName = prompt('Nom du fichier JS:', 'script.js');
                     if (fileName) {
-                        console.log('Création JS:', fileName);
-                        alert(`Fichier JavaScript "${fileName}" créé avec template !`);
+                        await createFileViaAPI(fileName, 'Créer un fichier JavaScript avec template de base');
                     }
                 });
             }
             
             if (createPhpBtn) {
-                createPhpBtn.addEventListener('click', () => {
+                createPhpBtn.addEventListener('click', async () => {
                     const fileName = prompt('Nom du fichier PHP:', 'script.php');
                     if (fileName) {
-                        console.log('Création PHP:', fileName);
-                        alert(`Fichier PHP "${fileName}" créé avec template !`);
+                        await createFileViaAPI(fileName, 'Créer un fichier PHP avec template de base');
                     }
                 });
             }
@@ -712,9 +709,9 @@
             const sqlEditor = document.getElementById('sqlEditor');
             
             if (connectDbBtn) {
-                connectDbBtn.addEventListener('click', () => {
+                connectDbBtn.addEventListener('click', async () => {
                     console.log('Connexion base de données');
-                    alert('Connexion à la base SQLite établie !');
+                    await sendAPIMessage('Vérifie la connexion à la base de données SQLite et affiche les tables existantes');
                 });
             }
             
@@ -735,20 +732,13 @@
             }
             
             if (executeQueryBtn) {
-                executeQueryBtn.addEventListener('click', () => {
+                executeQueryBtn.addEventListener('click', async () => {
                     const query = sqlEditor.value.trim();
                     if (query) {
                         console.log('Exécution requête:', query);
-                        const resultsDiv = document.getElementById('sqlResults');
-                        if (resultsDiv) {
-                            resultsDiv.innerHTML = `
-                                <div style="color: var(--primary); font-weight: bold; margin-bottom: 0.5rem;">✅ Requête exécutée avec succès</div>
-                                <div>Requête: <code>${query.substring(0, 100)}${query.length > 100 ? '...' : ''}</code></div>
-                                <div style="margin-top: 0.5rem; color: var(--muted-foreground);">Résultats simulés - intégration API requise pour données réelles</div>
-                            `;
-                        }
+                        await executeQueryViaAPI(query);
                     } else {
-                        alert('Veuillez saisir une requête SQL');
+                        showAPIMessage('Veuillez saisir une requête SQL', 'warning');
                     }
                 });
             }
@@ -768,9 +758,9 @@
                 predefinedSelect.addEventListener('change', (e) => {
                     if (e.target.value && sqlEditor) {
                         const queries = {
-                            'tables': 'SELECT name FROM sqlite_master WHERE type=\\'table\\';',
+                            'tables': "SELECT name FROM sqlite_master WHERE type='table';",
                             'users': 'CREATE TABLE users (id INTEGER PRIMARY KEY, nom TEXT, email TEXT);',
-                            'insert': 'INSERT INTO users (nom, email) VALUES (\\'John Doe\\', \\'john@example.com\\');'
+                            'insert': "INSERT INTO users (nom, email) VALUES ('John Doe', 'john@example.com');"
                         };
                         sqlEditor.value = queries[e.target.value] || '';
                     }
@@ -793,53 +783,53 @@
                     else if (btn.id.includes('Dark')) themeName = 'Sombre classique';
                     else if (btn.id.includes('Light')) themeName = 'Clair';
                     
-                    alert(`Thème "${themeName}" activé !`);
+                    showAPIMessage(`Thème "${themeName}" activé !`, 'success');
                 });
             });
             
             // Boutons d'action
             const regenerateApiBtn = document.getElementById('regenerateApiBtn');
             if (regenerateApiBtn) {
-                regenerateApiBtn.addEventListener('click', () => {
+                regenerateApiBtn.addEventListener('click', async () => {
                     if (confirm('Regénérer la clé API ? Cela invalidera la clé actuelle.')) {
                         console.log('Regénération clé API');
-                        alert('Nouvelle clé API générée avec succès !');
+                        await sendAPIMessage('Régénère une nouvelle clé API de sécurité');
                     }
                 });
             }
             
             const exportConfigBtn = document.getElementById('exportConfigBtn');
             if (exportConfigBtn) {
-                exportConfigBtn.addEventListener('click', () => {
+                exportConfigBtn.addEventListener('click', async () => {
                     console.log('Export configuration');
-                    alert('Configuration exportée vers sgc-config.json');
+                    await sendAPIMessage('Exporte la configuration actuelle vers un fichier sgc-config.json');
                 });
             }
             
             const importConfigBtn = document.getElementById('importConfigBtn');
             if (importConfigBtn) {
-                importConfigBtn.addEventListener('click', () => {
+                importConfigBtn.addEventListener('click', async () => {
                     console.log('Import configuration');
-                    alert('Sélectionnez un fichier sgc-config.json à importer');
+                    await sendAPIMessage('Importe une configuration depuis un fichier sgc-config.json');
                 });
             }
             
             const clearLogsBtn = document.getElementById('clearLogsBtn');
             if (clearLogsBtn) {
-                clearLogsBtn.addEventListener('click', () => {
+                clearLogsBtn.addEventListener('click', async () => {
                     if (confirm('Vider tous les logs système ?')) {
                         console.log('Vidage des logs');
-                        alert('Logs système vidés !');
+                        await sendAPIMessage('Vide tous les logs système et fichiers temporaires');
                     }
                 });
             }
             
             const restartServerBtn = document.getElementById('restartServerBtn');
             if (restartServerBtn) {
-                restartServerBtn.addEventListener('click', () => {
+                restartServerBtn.addEventListener('click', async () => {
                     if (confirm('Redémarrer le serveur SGC-AgentOne ?')) {
                         console.log('Redémarrage serveur');
-                        alert('Serveur en cours de redémarrage...');
+                        await sendAPIMessage('Redémarre le serveur SGC-AgentOne');
                     }
                 });
             }
@@ -850,6 +840,93 @@
                     console.log('Option changée:', e.target.nextElementSibling.textContent, 'Activé:', e.target.checked);
                 });
             });
+        }
+        
+        // === FONCTIONS D'AIDE API ===
+        let currentAuthToken = null;
+        
+        async function getAuthToken() {
+            if (currentAuthToken) return currentAuthToken;
+            
+            try {
+                const response = await fetch('/api/auth/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ client_type: 'webview' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentAuthToken = data.token;
+                    return currentAuthToken;
+                }
+            } catch (error) {
+                console.error('Erreur authentification:', error);
+            }
+            return null;
+        }
+        
+        async function sendAPIMessage(message) {
+            const token = await getAuthToken();
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': token || 'development'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        projectPath: '.',
+                        blind: false
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showAPIMessage(data.response || 'Action exécutée avec succès', 'success');
+                    return data;
+                } else {
+                    showAPIMessage('Erreur lors de l\'exécution', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur API:', error);
+                showAPIMessage('Erreur de communication avec le serveur', 'error');
+            }
+        }
+        
+        async function createFileViaAPI(fileName, description) {
+            const message = `${description}: ${fileName}`;
+            return await sendAPIMessage(message);
+        }
+        
+        async function executeQueryViaAPI(query) {
+            const message = `Exécute la requête SQL suivante: ${query}`;
+            return await sendAPIMessage(message);
+        }
+        
+        function showAPIMessage(text, type = 'info') {
+            const messagesContainer = document.getElementById('messages');
+            if (!messagesContainer) return;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant-message';
+            
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+            const color = type === 'success' ? 'var(--primary)' : type === 'error' ? '#ff6b6b' : type === 'warning' ? '#ffa726' : 'var(--muted-foreground)';
+            
+            messageDiv.innerHTML = `
+                <div style="color: ${color}; margin-bottom: 0.5rem;">
+                    <strong>${icon} SGC-AgentOne</strong>
+                </div>
+                <div>${text}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
     </script>
 </body>
