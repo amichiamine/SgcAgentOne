@@ -710,6 +710,80 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
         
+        // === FONCTION MODERNE POUR REMPLACER PROMPT() ===
+        function showModernFileDialog(title, placeholder, callback) {
+            // Créer modal moderne au lieu de prompt() primitif
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5); z-index: 1000; display: flex;
+                align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: var(--background); border-radius: 12px; padding: 2rem;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 400px; width: 90%;
+                    border: 1px solid var(--border);
+                ">
+                    <h3 style="margin: 0 0 1rem 0; color: var(--foreground);">${title}</h3>
+                    <input type="text" id="fileNameInput" placeholder="${placeholder}" 
+                           style="width: 100%; padding: 0.75rem; border: 1px solid var(--border);
+                                  border-radius: 6px; background: var(--secondary); color: var(--foreground);
+                                  font-family: inherit; margin-bottom: 1rem;" value="${placeholder}">
+                    <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                        <button id="cancelBtn" style="
+                            padding: 0.5rem 1rem; border: 1px solid var(--border);
+                            background: var(--secondary); color: var(--foreground);
+                            border-radius: 6px; cursor: pointer;
+                        ">Annuler</button>
+                        <button id="confirmBtn" style="
+                            padding: 0.5rem 1rem; border: none;
+                            background: var(--primary); color: var(--primary-foreground);
+                            border-radius: 6px; cursor: pointer;
+                        ">Créer</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            const input = modal.querySelector('#fileNameInput');
+            const confirmBtn = modal.querySelector('#confirmBtn');
+            const cancelBtn = modal.querySelector('#cancelBtn');
+            
+            // Focus et sélection
+            input.focus();
+            input.select();
+            
+            // Events
+            confirmBtn.onclick = () => {
+                const fileName = input.value.trim();
+                if (fileName) {
+                    callback(fileName);
+                }
+                document.body.removeChild(modal);
+            };
+            
+            cancelBtn.onclick = () => {
+                document.body.removeChild(modal);
+            };
+            
+            // Enter pour confirmer
+            input.onkeypress = (e) => {
+                if (e.key === 'Enter') {
+                    confirmBtn.click();
+                }
+            };
+            
+            // Échap pour annuler
+            modal.onkeydown = (e) => {
+                if (e.key === 'Escape') {
+                    cancelBtn.click();
+                }
+            };
+        }
+        
         // === FONCTIONS POUR LA VUE FICHIERS ===
         function setupFilesListeners() {
             console.log('Setup files listeners');
@@ -720,10 +794,9 @@
             
             if (createFileBtn) {
                 createFileBtn.addEventListener('click', async () => {
-                    const fileName = prompt('Nom du nouveau fichier:', 'nouveau_fichier.txt');
-                    if (fileName) {
+                    showModernFileDialog('Créer un nouveau fichier', 'nouveau_fichier.txt', async (fileName) => {
                         await createFileViaAPI(fileName, 'Créer un nouveau fichier');
-                    }
+                    });
                 });
             }
             
@@ -742,37 +815,33 @@
             
             if (createHtmlBtn) {
                 createHtmlBtn.addEventListener('click', async () => {
-                    const fileName = prompt('Nom du fichier HTML:', 'index.html');
-                    if (fileName) {
+                    showModernFileDialog('Créer un fichier HTML', 'index.html', async (fileName) => {
                         await createFileViaAPI(fileName, 'Créer un fichier HTML avec template de base');
-                    }
+                    });
                 });
             }
             
             if (createCssBtn) {
                 createCssBtn.addEventListener('click', async () => {
-                    const fileName = prompt('Nom du fichier CSS:', 'style.css');
-                    if (fileName) {
+                    showModernFileDialog('Créer un fichier CSS', 'style.css', async (fileName) => {
                         await createFileViaAPI(fileName, 'Créer un fichier CSS avec template de base');
-                    }
+                    });
                 });
             }
             
             if (createJsBtn) {
                 createJsBtn.addEventListener('click', async () => {
-                    const fileName = prompt('Nom du fichier JS:', 'script.js');
-                    if (fileName) {
+                    showModernFileDialog('Créer un fichier JavaScript', 'script.js', async (fileName) => {
                         await createFileViaAPI(fileName, 'Créer un fichier JavaScript avec template de base');
-                    }
+                    });
                 });
             }
             
             if (createPhpBtn) {
                 createPhpBtn.addEventListener('click', async () => {
-                    const fileName = prompt('Nom du fichier PHP:', 'script.php');
-                    if (fileName) {
+                    showModernFileDialog('Créer un fichier PHP', 'script.php', async (fileName) => {
                         await createFileViaAPI(fileName, 'Créer un fichier PHP avec template de base');
-                    }
+                    });
                 });
             }
             
@@ -805,8 +874,7 @@
             
             if (createTableBtn) {
                 createTableBtn.addEventListener('click', () => {
-                    const tableName = prompt('Nom de la nouvelle table:', 'ma_table');
-                    if (tableName) {
+                    showModernFileDialog('Créer une nouvelle table', 'ma_table', (tableName) => {
                         const sql = `CREATE TABLE ${tableName} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nom TEXT NOT NULL,
@@ -815,7 +883,7 @@
 );`;
                         sqlEditor.value = sql;
                         console.log('Template table créé:', tableName);
-                    }
+                    });
                 });
             }
             
