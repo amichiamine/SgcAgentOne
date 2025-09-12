@@ -52,7 +52,22 @@ if (($settings['security']['require_auth'] ?? false)) {
         $apiKey = substr($apiKey, 7);
     }
     
-    if (!$expectedKey || $apiKey !== $expectedKey) {
+    // Check for session token (webview)
+    $isSessionValid = false;
+    if (strpos($apiKey, 'webview_') === 0) {
+        $sessionFile = $projectRoot . '/sgc-agentone/core/config/webview_sessions.json';
+        if (file_exists($sessionFile)) {
+            $sessions = json_decode(file_get_contents($sessionFile), true) ?: [];
+            if (isset($sessions[$apiKey])) {
+                // Check if session is still valid (not expired)
+                if ((time() - $sessions[$apiKey]['created']) < 3600) {
+                    $isSessionValid = true;
+                }
+            }
+        }
+    }
+    
+    if (!$isSessionValid && (!$expectedKey || $apiKey !== $expectedKey)) {
         http_response_code(401);
         echo json_encode(['error' => 'Authentification requise']);
         exit();

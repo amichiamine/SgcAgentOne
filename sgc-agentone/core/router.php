@@ -49,6 +49,20 @@ if ($requestMethod === 'HEAD' && ($requestUri === '/api' || strpos($requestUri, 
 }
 
 // Routes API - priorité absolue, pas d'output avant
+if (strpos($requestUri, '/api/auth/token') === 0 || $requestUri === '/api/auth/token') {
+    // Inclusion de l'API auth
+    $authApiFile = $projectRoot . '/sgc-agentone/core/api/auth.php';
+    if (file_exists($authApiFile)) {
+        include $authApiFile;
+        exit();
+    } else {
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'API auth non disponible']);
+        exit();
+    }
+}
+
 if (strpos($requestUri, '/api/chat') === 0 || $requestUri === '/api/chat') {
     // Inclusion de l'API chat
     $chatApiFile = $projectRoot . '/sgc-agentone/core/api/chat.php';

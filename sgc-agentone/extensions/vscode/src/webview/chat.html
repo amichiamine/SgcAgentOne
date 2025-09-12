@@ -4,35 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SGC-AgentOne Chat</title>
+    <!-- Fonts -->
+    <link rel="stylesheet" href="theme/fonts.css">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Theme -->
+    <link rel="stylesheet" href="theme/colors.css">
+    <link rel="stylesheet" href="theme/syntax.css">
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #0a0e27;
-            color: #e2e8f0;
+            background: var(--background);
+            color: var(--foreground);
             height: 100vh;
             display: flex;
             flex-direction: column;
+            font-family: 'Inter', sans-serif;
         }
-        
+
         .header {
-            background: #1e293b;
-            padding: 1rem;
-            border-bottom: 1px solid #334155;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            height: 48px;
+            padding: 0 1rem;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            justify-content: space-between;
         }
-        
+
         .logo {
-            color: #06b6d4;
-            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-weight: 600;
+            color: var(--primary);
         }
-        
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-button {
+            /* Utilisation des classes clay */
+        }
+
         .chat-container {
             flex: 1;
             display: flex;
@@ -53,23 +70,27 @@
             padding: 1rem;
             border-radius: 12px;
             max-width: 80%;
+            word-wrap: break-word;
         }
-        
+
         .message.user {
-            background: linear-gradient(145deg, #1e40af, #1d4ed8);
+            background: linear-gradient(145deg, var(--primary), var(--primary));
+            color: var(--background);
             align-self: flex-end;
             margin-left: auto;
+            box-shadow: 4px 4px 8px var(--background);
         }
         
         .message.ai {
-            background: linear-gradient(145deg, #374151, #4b5563);
+            /* Utilisation de la classe clay-panel pour l'AI */
+            color: var(--foreground);
             align-self: flex-start;
         }
         
         .input-container {
             padding: 1rem;
-            background: #1e293b;
-            border-top: 1px solid #334155;
+            background: var(--card);
+            border-top: 1px solid var(--border);
             display: flex;
             gap: 0.5rem;
         }
@@ -77,55 +98,76 @@
         .message-input {
             flex: 1;
             padding: 0.75rem;
-            background: #334155;
-            border: 1px solid #475569;
+            background: var(--secondary);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            color: #e2e8f0;
+            color: var(--foreground);
             font-size: 1rem;
+            font-family: 'Inter', sans-serif;
         }
         
         .message-input:focus {
             outline: none;
-            border-color: #06b6d4;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px hsla(188, 95%, 42%, 0.2);
         }
         
         .send-button {
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(145deg, #06b6d4, #0891b2);
-            border: none;
             border-radius: 8px;
-            color: white;
+            color: var(--background);
             font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .send-button:hover {
-            background: linear-gradient(145deg, #0891b2, #0e7490);
+            font-family: 'Inter', sans-serif;
+            /* Utilisation de la classe clay-button */
         }
         
         .send-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
         }
         
-        .status {
-            text-align: center;
-            padding: 0.5rem;
+        /* Syntax highlighting demo styles */
+        .syntax-demo {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
             font-size: 0.9rem;
-            color: #94a3b8;
+            line-height: 1.4;
+        }
+        
+        .syntax-demo code {
+            display: block;
+            white-space: pre-wrap;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">🤖 SGC-AgentOne</div>
-        <div class="status">Assistant IA pour la création de fichiers</div>
+    <div class="header clay-panel">
+        <div class="logo">
+            <i class="fas fa-robot"></i>
+            SGC-AgentOne
+        </div>
+        <div class="nav-buttons">
+            <button class="nav-button clay-button active" data-tab="chat">
+                <i class="fas fa-comments"></i>
+            </button>
+            <button class="nav-button clay-button" data-tab="files">
+                <i class="fas fa-folder"></i>
+            </button>
+            <button class="nav-button clay-button" data-tab="database">
+                <i class="fas fa-database"></i>
+            </button>
+            <button class="nav-button clay-button" data-tab="settings">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
     </div>
     
-    <div class="chat-container">
+    <div class="chat-container clay-panel">
         <div class="messages" id="messages">
-            <div class="message ai">
+            <div class="message ai clay-panel">
                 <div>👋 Bonjour ! Je suis SGC-AgentOne, votre assistant IA.</div>
                 <div style="margin-top: 0.5rem;">Vous pouvez me demander de :</div>
                 <ul style="margin: 0.5rem 0 0 1.5rem;">
@@ -136,10 +178,25 @@
                     <li>Exécuter des requêtes SQL</li>
                 </ul>
                 <div style="margin-top: 0.5rem;">Essayez : <em>"Crée un fichier index.html avec une page d'accueil"</em></div>
+                
+                <!-- Démonstration de la coloration syntaxique -->
+                <div class="syntax-demo clay-panel" style="margin-top: 1rem;">
+                    <div style="margin-bottom: 0.5rem; font-weight: 600;">🎨 Démonstration de la coloration syntaxique :</div>
+                    <code>
+<span class="syntax-php">&lt;?php</span>
+<span class="syntax-keyword">function</span> <span class="syntax-php">greeting</span>(<span class="syntax-keyword">string</span> <span class="syntax-php">$name</span>) {
+    <span class="syntax-keyword">return</span> <span class="syntax-string">"Hello " . $name . "!"</span>; <span class="syntax-comment">// Message de bienvenue</span>
+}
+
+<span class="syntax-php">$count</span> = <span class="syntax-number">42</span>;
+<span class="syntax-keyword">echo</span> <span class="syntax-string">"<span class="syntax-html">&lt;h1&gt;</span>SGC-AgentOne<span class="syntax-html">&lt;/h1&gt;</span>"</span>;
+<span class="syntax-php">?&gt;</span>
+                    </code>
+                </div>
             </div>
         </div>
         
-        <div class="input-container">
+        <div class="input-container clay-panel">
             <input 
                 type="text" 
                 class="message-input" 
@@ -147,7 +204,7 @@
                 placeholder="Tapez votre message ici..."
                 autocomplete="off"
             >
-            <button class="send-button" id="sendButton">Envoyer</button>
+            <button class="send-button clay-button" id="sendButton">Envoyer</button>
         </div>
     </div>
 
@@ -158,10 +215,36 @@
         
         function addMessage(content, isUser = false) {
             const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            messageDiv.className = `message ${isUser ? 'user' : 'ai clay-panel'}`;
             messageDiv.innerHTML = content;
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Get authentication token from server (secure approach)
+        let authToken = null;
+        async function getAuthToken() {
+            if (!authToken) {
+                try {
+                    const response = await fetch('/api/auth/token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            client_type: 'webview'
+                        })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        authToken = data.token;
+                        console.log('🔐 Token d\'authentification obtenu');
+                    }
+                } catch (error) {
+                    console.log('🔓 Authentification non requise, procédure sans token');
+                }
+            }
+            return authToken;
         }
         
         async function sendMessage() {
@@ -175,12 +258,19 @@
             sendButton.textContent = 'Envoi...';
             
             try {
+                const token = await getAuthToken();
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                // Ajout du token d'authentification sécurisé si disponible
+                if (token) {
+                    headers['X-API-Key'] = token;
+                }
+                
                 const response = await fetch('/api/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-Key': 'sgc-agent-dev-key-2024'
-                    },
+                    headers: headers,
                     body: JSON.stringify({
                         message: message,
                         projectPath: '.',
