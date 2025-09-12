@@ -62,9 +62,5 @@
     {
         "pattern": "lance la requête SQL *",
         "action": "execute query"
-    },
-    {
-        "pattern": "newly added test pattern *",
-        "action": "update file"
     }
 ]

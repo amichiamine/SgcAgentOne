@@ -159,6 +159,9 @@
             <button class="nav-button clay-button" data-tab="database">
                 <i class="fas fa-database"></i>
             </button>
+            <button class="nav-button clay-button" data-tab="prompts">
+                <i class="fas fa-magic"></i>
+            </button>
             <button class="nav-button clay-button" data-tab="settings">
                 <i class="fas fa-cog"></i>
             </button>
@@ -502,6 +505,125 @@
                         </div>
                     `;
                     setupDatabaseListeners();
+                    break;
+                    
+                case 'prompts':
+                    chatContainer.innerHTML = `
+                        <div class="tab-content clay-panel" style="flex: 1; padding: 1.5rem; margin: 1rem; overflow-y: auto;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h2><i class="fas fa-magic"></i> Constructeur de Prompts</h2>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button class="clay-button" id="refreshPatternsBtn">
+                                        <i class="fas fa-sync-alt"></i> Actualiser
+                                    </button>
+                                    <button class="clay-button" id="exportPatternsBtn">
+                                        <i class="fas fa-download"></i> Exporter
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Zone de recherche -->
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-search" style="color: var(--muted-foreground);"></i>
+                                    <input type="text" id="searchPatterns" placeholder="Rechercher dans les patterns..." 
+                                           style="flex: 1; padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; background: var(--background); color: var(--foreground);">
+                                </div>
+                            </div>
+
+                            <!-- Liste des patterns existants -->
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <h4><i class="fas fa-list"></i> Patterns existants (<span id="patternsCount">0</span>)</h4>
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <span style="font-size: 0.8rem; color: var(--muted-foreground);">Filtrer par action:</span>
+                                        <select id="filterAction" style="padding: 0.25rem; border: 1px solid var(--border); border-radius: 4px; background: var(--background); color: var(--foreground);">
+                                            <option value="">Toutes</option>
+                                            <option value="create file">create file</option>
+                                            <option value="update file">update file</option>
+                                            <option value="read file">read file</option>
+                                            <option value="create database">create database</option>
+                                            <option value="execute query">execute query</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div id="patternsList" style="max-height: 300px; overflow-y: auto;">
+                                    <div style="text-align: center; color: var(--muted-foreground); padding: 2rem;">
+                                        <i class="fas fa-spinner fa-spin"></i> Chargement des patterns...
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Formulaire nouveau pattern -->
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <h4><i class="fas fa-plus"></i> Nouveau Pattern</h4>
+                                <div style="display: grid; gap: 1rem; margin-top: 1rem;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Pattern de commande:</label>
+                                        <input type="text" id="newPattern" placeholder="Ex: génère une API REST pour *" 
+                                               style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--background); color: var(--foreground);">
+                                        <div style="font-size: 0.8rem; color: var(--muted-foreground); margin-top: 0.25rem;">
+                                            Utilisez * pour capturer des paramètres. Ex: "crée un fichier *" capturera le nom du fichier.
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Action correspondante:</label>
+                                        <select id="newAction" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--background); color: var(--foreground);">
+                                            <option value="">Sélectionnez une action...</option>
+                                            <option value="create file">create file - Créer un fichier</option>
+                                            <option value="update file">update file - Modifier un fichier</option>
+                                            <option value="read file">read file - Lire un fichier</option>
+                                            <option value="create database">create database - Créer base de données</option>
+                                            <option value="execute query">execute query - Exécuter requête SQL</option>
+                                        </select>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <button class="clay-button" id="addPatternBtn" style="flex: 1;">
+                                            <i class="fas fa-plus"></i> Ajouter Pattern
+                                        </button>
+                                        <button class="clay-button" id="testPatternBtn">
+                                            <i class="fas fa-vial"></i> Tester
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Testeur en temps réel -->
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <h4><i class="fas fa-flask"></i> Testeur en temps réel</h4>
+                                <div style="margin-top: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Commande à tester:</label>
+                                    <input type="text" id="testCommand" placeholder="Ex: génère une API pour utilisateurs" 
+                                           style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--background); color: var(--foreground);">
+                                </div>
+                                <div id="testResult" style="margin-top: 1rem; padding: 1rem; background: var(--secondary); border-radius: 6px; min-height: 60px;">
+                                    <div style="color: var(--muted-foreground); text-align: center;">
+                                        Tapez une commande ci-dessus pour voir l'interprétation en temps réel...
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions rapides -->
+                            <div class="clay-panel" style="padding: 1rem;">
+                                <h4><i class="fas fa-bolt"></i> Templates rapides</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                                    <button class="clay-button" id="templateCreateFile">
+                                        <i class="fas fa-file"></i> Templates Création
+                                    </button>
+                                    <button class="clay-button" id="templateModifyFile">
+                                        <i class="fas fa-edit"></i> Templates Modification
+                                    </button>
+                                    <button class="clay-button" id="templateDatabase">
+                                        <i class="fas fa-database"></i> Templates Database
+                                    </button>
+                                    <button class="clay-button" id="resetPatternsBtn">
+                                        <i class="fas fa-undo"></i> Réinitialiser
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    setupPromptsListeners();
                     break;
                     
                 case 'settings':
@@ -1059,6 +1181,417 @@
                     console.log('Option changée:', e.target.nextElementSibling.textContent, 'Activé:', e.target.checked);
                 });
             });
+        }
+
+        // === FONCTIONS POUR LA VUE PROMPTS ===
+        function setupPromptsListeners() {
+            console.log('Setup prompts listeners');
+            
+            // Variables globales pour la vue prompts
+            let patterns = [];
+            let filteredPatterns = [];
+            
+            // Chargement initial des patterns
+            loadPatterns();
+            
+            // Event listeners pour la recherche et le filtrage
+            const searchInput = document.getElementById('searchPatterns');
+            const filterSelect = document.getElementById('filterAction');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    filterPatterns();
+                });
+            }
+            
+            if (filterSelect) {
+                filterSelect.addEventListener('change', (e) => {
+                    filterPatterns();
+                });
+            }
+            
+            // Event listeners pour le formulaire nouveau pattern
+            const newPatternInput = document.getElementById('newPattern');
+            const newActionSelect = document.getElementById('newAction');
+            const addPatternBtn = document.getElementById('addPatternBtn');
+            const testPatternBtn = document.getElementById('testPatternBtn');
+            
+            if (addPatternBtn) {
+                addPatternBtn.addEventListener('click', async () => {
+                    await addNewPattern();
+                });
+            }
+            
+            if (testPatternBtn) {
+                testPatternBtn.addEventListener('click', () => {
+                    testCurrentPattern();
+                });
+            }
+            
+            // Event listener pour le testeur temps réel
+            const testCommandInput = document.getElementById('testCommand');
+            if (testCommandInput) {
+                testCommandInput.addEventListener('input', (e) => {
+                    testCommandRealTime(e.target.value);
+                });
+            }
+            
+            // Event listeners pour les boutons d'actions
+            const refreshBtn = document.getElementById('refreshPatternsBtn');
+            const exportBtn = document.getElementById('exportPatternsBtn');
+            
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    loadPatterns();
+                });
+            }
+            
+            if (exportBtn) {
+                exportBtn.addEventListener('click', () => {
+                    exportPatterns();
+                });
+            }
+            
+            // Event listeners pour les templates rapides
+            document.getElementById('templateCreateFile')?.addEventListener('click', () => {
+                addTemplatePatterns('create');
+            });
+            
+            document.getElementById('templateModifyFile')?.addEventListener('click', () => {
+                addTemplatePatterns('modify');
+            });
+            
+            document.getElementById('templateDatabase')?.addEventListener('click', () => {
+                addTemplatePatterns('database');
+            });
+            
+            document.getElementById('resetPatternsBtn')?.addEventListener('click', () => {
+                if (confirm('Réinitialiser tous les patterns aux valeurs par défaut ?')) {
+                    resetPatterns();
+                }
+            });
+            
+            // Fonctions internes
+            async function loadPatterns() {
+                try {
+                    const response = await fetch('/api/prompts', {
+                        headers: {
+                            'X-API-Key': await getAuthToken() || 'development'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        patterns = await response.json();
+                        filteredPatterns = [...patterns];
+                        updatePatternsDisplay();
+                    } else {
+                        // Fallback : afficher les patterns par défaut
+                        showAPIMessage('Impossible de charger les patterns. Affichage des valeurs par défaut.', 'warning');
+                        loadDefaultPatterns();
+                    }
+                } catch (error) {
+                    console.error('Erreur chargement patterns:', error);
+                    showAPIMessage('Erreur de connexion. Affichage des patterns par défaut.', 'error');
+                    loadDefaultPatterns();
+                }
+            }
+            
+            function loadDefaultPatterns() {
+                patterns = [
+                    { pattern: "crée un fichier *", action: "create file" },
+                    { pattern: "génère le fichier *", action: "create file" },
+                    { pattern: "modifie le fichier *", action: "update file" },
+                    { pattern: "lis le fichier *", action: "read file" },
+                    { pattern: "connecte à la base *", action: "create database" },
+                    { pattern: "exécute la requête *", action: "execute query" }
+                ];
+                filteredPatterns = [...patterns];
+                updatePatternsDisplay();
+            }
+            
+            function filterPatterns() {
+                const searchTerm = searchInput?.value?.toLowerCase() || '';
+                const actionFilter = filterSelect?.value || '';
+                
+                filteredPatterns = patterns.filter(pattern => {
+                    const matchesSearch = pattern.pattern.toLowerCase().includes(searchTerm) || 
+                                        pattern.action.toLowerCase().includes(searchTerm);
+                    const matchesAction = !actionFilter || pattern.action === actionFilter;
+                    return matchesSearch && matchesAction;
+                });
+                
+                updatePatternsDisplay();
+            }
+            
+            function updatePatternsDisplay() {
+                const patternsList = document.getElementById('patternsList');
+                const patternsCount = document.getElementById('patternsCount');
+                
+                if (patternsCount) {
+                    patternsCount.textContent = filteredPatterns.length;
+                }
+                
+                if (!patternsList) return;
+                
+                if (filteredPatterns.length === 0) {
+                    patternsList.innerHTML = `
+                        <div style="text-align: center; color: var(--muted-foreground); padding: 2rem;">
+                            <i class="fas fa-search"></i> Aucun pattern trouvé
+                        </div>
+                    `;
+                    return;
+                }
+                
+                patternsList.innerHTML = filteredPatterns.map((pattern, index) => `
+                    <div class="pattern-item clay-panel" style="padding: 1rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <div style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--primary);">
+                                "${pattern.pattern}"
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--muted-foreground); margin-top: 0.25rem;">
+                                → ${pattern.action}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="clay-button" onclick="editPattern(${index})" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="clay-button" onclick="deletePattern(${index})" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            async function addNewPattern() {
+                const pattern = newPatternInput?.value?.trim();
+                const action = newActionSelect?.value;
+                
+                if (!pattern || !action) {
+                    showAPIMessage('Veuillez remplir le pattern et sélectionner une action', 'warning');
+                    return;
+                }
+                
+                if (patterns.some(p => p.pattern === pattern)) {
+                    showAPIMessage('Ce pattern existe déjà', 'warning');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/prompts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-API-Key': await getAuthToken() || 'development'
+                        },
+                        body: JSON.stringify({ pattern, action })
+                    });
+                    
+                    if (response.ok) {
+                        showAPIMessage('Pattern ajouté avec succès', 'success');
+                        newPatternInput.value = '';
+                        newActionSelect.value = '';
+                        loadPatterns();
+                    } else {
+                        showAPIMessage('Erreur lors de l\'ajout du pattern', 'error');
+                    }
+                } catch (error) {
+                    console.error('Erreur ajout pattern:', error);
+                    showAPIMessage('Erreur de connexion', 'error');
+                }
+            }
+            
+            function testCurrentPattern() {
+                const pattern = newPatternInput?.value?.trim();
+                if (!pattern) {
+                    showAPIMessage('Entrez un pattern à tester', 'warning');
+                    return;
+                }
+                
+                const testCommand = testCommandInput?.value?.trim() || 'test fichier exemple.txt';
+                testCommandRealTime(testCommand, pattern);
+            }
+            
+            function testCommandRealTime(command, customPattern = null) {
+                const testResult = document.getElementById('testResult');
+                if (!testResult) return;
+                
+                if (!command.trim()) {
+                    testResult.innerHTML = `
+                        <div style="color: var(--muted-foreground); text-align: center;">
+                            Tapez une commande ci-dessus pour voir l'interprétation en temps réel...
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Simulation de l'interprétation (en attendant l'API backend)
+                const testPatterns = customPattern ? 
+                    [{ pattern: customPattern, action: newActionSelect?.value || 'create file' }] : 
+                    patterns;
+                
+                let matchedPattern = null;
+                for (const pattern of testPatterns) {
+                    if (matchesPattern(command.toLowerCase(), pattern.pattern.toLowerCase())) {
+                        matchedPattern = pattern;
+                        break;
+                    }
+                }
+                
+                if (matchedPattern) {
+                    const params = extractParametersFromCommand(command, matchedPattern.pattern);
+                    testResult.innerHTML = `
+                        <div style="color: var(--primary);">
+                            <strong>✅ Correspondance trouvée</strong>
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <strong>Pattern:</strong> "${matchedPattern.pattern}"
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <strong>Action:</strong> ${matchedPattern.action}
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <strong>Paramètres extraits:</strong> ${JSON.stringify(params)}
+                        </div>
+                    `;
+                } else {
+                    testResult.innerHTML = `
+                        <div style="color: #ff6b6b;">
+                            <strong>❌ Aucune correspondance</strong>
+                        </div>
+                        <div style="margin-top: 0.5rem; color: var(--muted-foreground);">
+                            La commande "${command}" ne correspond à aucun pattern existant.
+                        </div>
+                    `;
+                }
+            }
+            
+            function matchesPattern(command, pattern) {
+                // Simple pattern matching avec wildcards
+                const regex = pattern.replace(/\*/g, '.*');
+                return new RegExp(regex).test(command);
+            }
+            
+            function extractParametersFromCommand(command, pattern) {
+                const params = {};
+                if (pattern.includes('*')) {
+                    const regex = pattern.replace(/\*/g, '(.+)');
+                    const match = command.match(new RegExp(regex));
+                    if (match && match[1]) {
+                        params.captured = match[1].trim();
+                        // Tenter d'extraire un nom de fichier
+                        if (match[1].includes('.')) {
+                            params.filename = match[1].trim();
+                        }
+                    }
+                }
+                return params;
+            }
+            
+            function exportPatterns() {
+                const dataStr = JSON.stringify(patterns, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'sgc-patterns-export.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                showAPIMessage('Patterns exportés avec succès', 'success');
+            }
+            
+            function addTemplatePatterns(type) {
+                const templates = {
+                    create: [
+                        { pattern: "génère une API REST pour *", action: "create file" },
+                        { pattern: "crée une page web *", action: "create file" },
+                        { pattern: "ajoute un composant *", action: "create file" }
+                    ],
+                    modify: [
+                        { pattern: "ajoute la fonction * au fichier *", action: "update file" },
+                        { pattern: "corrige le fichier *", action: "update file" },
+                        { pattern: "optimise le code de *", action: "update file" }
+                    ],
+                    database: [
+                        { pattern: "crée une table * avec les colonnes *", action: "execute query" },
+                        { pattern: "ajoute des données à la table *", action: "execute query" },
+                        { pattern: "sauvegarde la base dans *", action: "execute query" }
+                    ]
+                };
+                
+                const newPatternInput = document.getElementById('newPattern');
+                const newActionSelect = document.getElementById('newAction');
+                
+                if (templates[type] && newPatternInput && newActionSelect) {
+                    const template = templates[type][0]; // Prendre le premier template
+                    newPatternInput.value = template.pattern;
+                    newActionSelect.value = template.action;
+                    showAPIMessage(`Template "${type}" chargé`, 'success');
+                }
+            }
+            
+            async function resetPatterns() {
+                try {
+                    const response = await fetch('/api/prompts/reset', {
+                        method: 'POST',
+                        headers: {
+                            'X-API-Key': await getAuthToken() || 'development'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        showAPIMessage('Patterns réinitialisés aux valeurs par défaut', 'success');
+                        loadPatterns();
+                    } else {
+                        showAPIMessage('Erreur lors de la réinitialisation', 'error');
+                    }
+                } catch (error) {
+                    console.error('Erreur reset patterns:', error);
+                    loadDefaultPatterns();
+                    showAPIMessage('Patterns réinitialisés localement', 'warning');
+                }
+            }
+            
+            // Fonctions globales pour les boutons inline
+            window.editPattern = function(index) {
+                const pattern = filteredPatterns[index];
+                if (pattern) {
+                    const newPatternInput = document.getElementById('newPattern');
+                    const newActionSelect = document.getElementById('newAction');
+                    if (newPatternInput && newActionSelect) {
+                        newPatternInput.value = pattern.pattern;
+                        newActionSelect.value = pattern.action;
+                        showAPIMessage('Pattern chargé dans le formulaire', 'info');
+                    }
+                }
+            };
+            
+            window.deletePattern = async function(index) {
+                const pattern = filteredPatterns[index];
+                if (!pattern) return;
+                
+                if (!confirm(`Supprimer le pattern "${pattern.pattern}" ?`)) return;
+                
+                try {
+                    const response = await fetch(`/api/prompts/${encodeURIComponent(pattern.pattern)}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-API-Key': await getAuthToken() || 'development'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        showAPIMessage('Pattern supprimé avec succès', 'success');
+                        loadPatterns();
+                    } else {
+                        showAPIMessage('Erreur lors de la suppression', 'error');
+                    }
+                } catch (error) {
+                    console.error('Erreur suppression pattern:', error);
+                    showAPIMessage('Erreur de connexion', 'error');
+                }
+            };
         }
     </script>
 </body>

@@ -1,0 +1,66 @@
+[
+  {
+    "pattern": "crée un fichier *",
+    "action": "create file"
+  },
+  {
+    "pattern": "create file *",
+    "action": "create file"
+  },
+  {
+    "pattern": "génère le fichier *",
+    "action": "create file"
+  },
+  {
+    "pattern": "ajoute un fichier *",
+    "action": "create file"
+  },
+  {
+    "pattern": "modifie le fichier *",
+    "action": "update file"
+  },
+  {
+    "pattern": "update file *",
+    "action": "update file"
+  },
+  {
+    "pattern": "change le contenu *",
+    "action": "update file"
+  },
+  {
+    "pattern": "lis le fichier *",
+    "action": "read file"
+  },
+  {
+    "pattern": "read file *",
+    "action": "read file"
+  },
+  {
+    "pattern": "affiche le contenu *",
+    "action": "read file"
+  },
+  {
+    "pattern": "connecte à la base *",
+    "action": "create database"
+  },
+  {
+    "pattern": "create database",
+    "action": "create database"
+  },
+  {
+    "pattern": "crée la base de données",
+    "action": "create database"
+  },
+  {
+    "pattern": "exécute la requête *",
+    "action": "execute query"
+  },
+  {
+    "pattern": "execute query *",
+    "action": "execute query"
+  },
+  {
+    "pattern": "lance la requête SQL *",
+    "action": "execute query"
+  }
+]

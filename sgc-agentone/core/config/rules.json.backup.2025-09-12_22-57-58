@@ -64,7 +64,7 @@
         "action": "execute query"
     },
     {
-        "pattern": "newly added test pattern *",
-        "action": "update file"
+        "pattern": "test automated pattern *",
+        "action": "create file"
     }
 ]

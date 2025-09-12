@@ -77,6 +77,20 @@ if (strpos($requestUri, '/api/chat') === 0 || $requestUri === '/api/chat') {
     }
 }
 
+if (strpos($requestUri, '/api/prompts') === 0 || $requestUri === '/api/prompts') {
+    // Inclusion de l'API prompts
+    $promptsApiFile = $projectRoot . '/sgc-agentone/core/api/prompts.php';
+    if (file_exists($promptsApiFile)) {
+        include $promptsApiFile;
+        exit();
+    } else {
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'API prompts non disponible']);
+        exit();
+    }
+}
+
 // Log simple des requêtes pour les autres routes (dans error_log, jamais echo avant headers)
 $timestamp = date('[H:i:s]');
 error_log("{$timestamp} {$requestMethod} {$requestUri}");
