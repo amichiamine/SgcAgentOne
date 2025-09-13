@@ -31,22 +31,30 @@ function getProjectInfo() {
         }
     }
     
-    // Détection spéciale Replit vs XAMPP/hébergement
-    const isReplit = hostname.includes('.replit.dev') || hostname === 'localhost';
+    // Détection spéciale Replit uniquement
+    const isReplit = hostname.includes('.replit.dev');
     
     return {
         name: projectName || 'sgc-agentone', // fallback par défaut
         isReplit: isReplit,
-        basePath: projectName ? `/${projectName}` : '',
-        themePath: projectName ? `/${projectName}/extensions/webview/theme` : '/extensions/webview/theme',
-        apiPath: projectName ? `/${projectName}/api` : '/api'
+        basePath: projectName,
+        themePath: 'theme',
+        apiPath: 'api'
     };
 }
 
 // Fonction de détection automatique du chemin de base de l'API
 function getApiBase() {
-    const projectInfo = getProjectInfo();
-    return projectInfo.apiPath + '/';
+    const currentPath = window.location.pathname;
+    const isInExtensions = currentPath.includes('/extensions/');
+    
+    if (isInExtensions) {
+        // Si on est dans /extensions/, aller vers la racine du projet
+        return '../../api/';
+    }
+    
+    // Pour les autres cas (racine du projet)
+    return 'api/';
 }
 
 class SGCBrowser {
@@ -505,7 +513,7 @@ class SGCBrowser {
                 if (htmlFiles.length > 0) {
                     // Show selection dialog or navigate to first HTML file
                     const firstFile = htmlFiles[0];
-                    const fileUrl = `${window.location.origin}/api/files/read?path=${encodeURIComponent(firstFile.path)}`;
+                    const fileUrl = `${getApiBase()}files/read?path=${encodeURIComponent(firstFile.path)}`;
                     this.navigate(fileUrl);
                 } else {
                     this.statusText.textContent = 'Aucun fichier HTML trouvé';

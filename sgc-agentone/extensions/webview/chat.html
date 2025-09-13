@@ -57,17 +57,10 @@
             let themePath = '';
             let apiPath = '';
             
-            if (isXAMPP || (!isReplit && !isReplitDev)) {
-                // XAMPP/hébergement : chemins relatifs ou absolus selon la structure
-                basePath = projectName ? `/${projectName}` : '';
-                themePath = projectName ? `/${projectName}/extensions/webview/theme` : '/extensions/webview/theme';
-                apiPath = projectName ? `/${projectName}/api` : '/api';
-            } else {
-                // Replit : utiliser la logique existante
-                basePath = projectName ? `/${projectName}` : '';
-                themePath = projectName ? `/${projectName}/extensions/webview/theme` : '/extensions/webview/theme';
-                apiPath = projectName ? `/${projectName}/api` : '/api';
-            }
+            // Chemins relatifs universels depuis /extensions/webview/
+            basePath = projectName || '';
+            themePath = './theme';  // themes sont dans le même dossier webview
+            apiPath = '../../api'; // remonter 2 niveaux puis /api
             
             return {
                 name: projectName || 'sgc-agentone',
