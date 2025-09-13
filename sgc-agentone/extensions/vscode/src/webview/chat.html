@@ -404,6 +404,29 @@
             setupInitialListeners();
             initializeInterface();
         });
+        
+        // Gestionnaire de messages pour la communication iframe
+        window.addEventListener('message', function(event) {
+            // Vérifier l'origine pour la sécurité
+            if (event.origin !== window.location.origin) return;
+            
+            if (event.data.type === 'navigate' && event.data.view) {
+                console.log('Navigation demandée depuis iframe:', event.data.view);
+                
+                // Supprimer la classe active de tous les boutons
+                document.querySelectorAll('.nav-button').forEach(b => 
+                    b.classList.remove('active'));
+                
+                // Ajouter la classe active au bouton correspondant
+                const targetButton = document.querySelector(`[data-tab="${event.data.view}"]`);
+                if (targetButton) {
+                    targetButton.classList.add('active');
+                }
+                
+                // Gérer le changement de vue
+                handleTabSwitch(event.data.view);
+            }
+        });
 
         function setupInitialListeners() {
             // Event listeners pour les boutons de navigation
@@ -1065,7 +1088,7 @@
                 case 'browser':
                     chatContainer.innerHTML = `
                         <iframe 
-                            src="browser.html" 
+                            src="/extensions/vscode/src/webview/browser.html" 
                             style="width: 100%; height: 100%; border: none; border-radius: 8px;" 
                             title="Navigateur web intégré">
                         </iframe>

@@ -185,10 +185,25 @@ class SGCBrowser {
         this.historyIndex = this.history.length - 1;
         this.updateNavigationButtons();
         
-        // Navigate iframe
+        // Navigate iframe with enhanced error handling
         try {
             this.browserFrame.src = url;
             this.statusText.textContent = `Chargement de ${this.getDomain(url)}...`;
+            
+            // Set a timeout to detect frame-busting
+            this.frameTimeout = setTimeout(() => {
+                try {
+                    // Try to access the iframe content to detect if it loaded
+                    const frameDoc = this.browserFrame.contentDocument || this.browserFrame.contentWindow.document;
+                    if (!frameDoc || frameDoc.location.href === 'about:blank') {
+                        this.onFrameError(`Cette page ne peut pas être affichée dans un frame. <a href="${url}" target="_blank">Ouvrir dans un nouvel onglet</a>`);
+                    }
+                } catch (e) {
+                    // Cross-origin or frame-busting detected
+                    this.onFrameError(`Cette page ne peut pas être affichée dans un frame. <a href="${url}" target="_blank">Ouvrir dans un nouvel onglet</a>`);
+                }
+            }, 5000);
+            
         } catch (error) {
             this.onFrameError('Erreur lors du chargement de la page');
         }
@@ -314,6 +329,12 @@ class SGCBrowser {
         this.setLoading(false);
         this.hideError();
         
+        // Clear the frame timeout if the page loaded successfully
+        if (this.frameTimeout) {
+            clearTimeout(this.frameTimeout);
+            this.frameTimeout = null;
+        }
+        
         try {
             const frameUrl = this.browserFrame.contentWindow.location.href;
             if (frameUrl && frameUrl !== 'about:blank') {
@@ -332,7 +353,7 @@ class SGCBrowser {
 
     showError(message) {
         this.errorPage.style.display = 'flex';
-        document.getElementById('error-message').textContent = message;
+        document.getElementById('error-message').innerHTML = message;
         this.statusText.textContent = 'Erreur de chargement';
     }
 
@@ -364,10 +385,12 @@ class SGCBrowser {
         
         switch (type) {
             case 'local':
-                url = window.location.origin;
+                // Preview the main SGC-AgentOne interface
+                url = '/';
                 break;
             case 'server':
-                url = 'http://localhost:5000';
+                // Preview the plug & play deployment
+                url = '/deployment/plugandplay/';
                 break;
             case 'files':
                 this.showHtmlFiles();

@@ -228,5 +228,37 @@
     <!-- Scripts -->
     <script src="navigation.js"></script>
     <script src="browser.js"></script>
+    
+    <!-- Initialize navigation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate navigation links
+            const navLinks = document.getElementById('nav-links');
+            if (navLinks && window.SGCNavigation) {
+                const views = window.SGCNavigation.getAvailableViews();
+                navLinks.innerHTML = Object.keys(views).map(viewId => `
+                    <a href="#" class="nav-link" data-view="${viewId}">
+                        <i class="${views[viewId].icon}"></i>
+                        <span>${views[viewId].name}</span>
+                    </a>
+                `).join('');
+                
+                // Add click handlers for navigation
+                navLinks.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const viewId = link.dataset.view;
+                        // Send message to parent to change view
+                        if (window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'navigate',
+                                view: viewId
+                            }, window.location.origin);
+                        }
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>
