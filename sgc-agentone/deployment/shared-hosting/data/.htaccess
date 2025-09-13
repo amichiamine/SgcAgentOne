@@ -1,0 +1,14 @@
+# Protection totale du dossier data (base de données SQLite)
+Deny from all
+
+# Protection spécifique des fichiers de base de données
+<Files ~ "\.sqlite3?$">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Protection des fichiers de log
+<Files ~ "\.log$">
+    Order allow,deny
+    Deny from all
+</Files>

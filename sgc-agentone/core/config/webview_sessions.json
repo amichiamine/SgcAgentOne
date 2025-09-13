@@ -1,38 +1,22 @@
 {
-    "webview_7fdf4012a939d03b11a5bfb798a9393a_1757722509": {
-        "created": 1757722509,
+    "webview_a18d15b77cd46836a7e19418423ce0dd_1757731916": {
+        "created": 1757731916,
         "client_type": "webview",
         "permissions": [
             "chat",
             "file_operations"
         ]
     },
-    "webview_1f1630e1cee1d6c68d10241342558630_1757722518": {
-        "created": 1757722518,
+    "webview_4d4f566a64bca5f8ff97219c06647222_1757731932": {
+        "created": 1757731932,
         "client_type": "webview",
         "permissions": [
             "chat",
             "file_operations"
         ]
     },
-    "webview_ef65a1e8dde4d6d8ead343613f27dff8_1757722753": {
-        "created": 1757722753,
-        "client_type": "webview",
-        "permissions": [
-            "chat",
-            "file_operations"
-        ]
-    },
-    "webview_17f62cc77249d51bda2a768c0e7b7dc1_1757723899": {
-        "created": 1757723899,
-        "client_type": "webview",
-        "permissions": [
-            "chat",
-            "file_operations"
-        ]
-    },
-    "webview_98c7e8baad0595d90e344245f1e5a6b9_1757724425": {
-        "created": 1757724425,
+    "webview_a0f4969a19a308a420203d160894a04e_1757732383": {
+        "created": 1757732383,
         "client_type": "webview",
         "permissions": [
             "chat",
