@@ -1,12 +1,4 @@
 {
-    "webview_3ce7c642b71341b4016df5defbfa68d2_1757719107": {
-        "created": 1757719107,
-        "client_type": "webview",
-        "permissions": [
-            "chat",
-            "file_operations"
-        ]
-    },
     "webview_7fdf4012a939d03b11a5bfb798a9393a_1757722509": {
         "created": 1757722509,
         "client_type": "webview",
@@ -17,6 +9,14 @@
     },
     "webview_1f1630e1cee1d6c68d10241342558630_1757722518": {
         "created": 1757722518,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
+    },
+    "webview_ef65a1e8dde4d6d8ead343613f27dff8_1757722753": {
+        "created": 1757722753,
         "client_type": "webview",
         "permissions": [
             "chat",
