@@ -105,6 +105,20 @@ if (strpos($requestUri, '/api/server') === 0 || $requestUri === '/api/server') {
     }
 }
 
+if (strpos($requestUri, '/api/files') === 0 || $requestUri === '/api/files') {
+    // Inclusion de l'API files management
+    $filesApiFile = $projectRoot . '/sgc-agentone/core/api/files.php';
+    if (file_exists($filesApiFile)) {
+        include $filesApiFile;
+        exit();
+    } else {
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'API files non disponible']);
+        exit();
+    }
+}
+
 if (strpos($requestUri, '/api/prompts') === 0 || $requestUri === '/api/prompts') {
     // Inclusion de l'API prompts
     $promptsApiFile = $projectRoot . '/sgc-agentone/core/api/prompts.php';
