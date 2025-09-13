@@ -87,3 +87,6 @@ Custom "SGC-Commander" theme with:
 - **NEW: Enhanced Browser view display** - Fixed iframe height issue in chat interface by implementing flex layout structure
 - Modified JavaScript in chat.html to use consistent flex-based layout for browser view matching other tabs
 - Improved user experience with properly sized web navigation area that fills available space dynamically
+- **FIXED: Deployment path consistency** - Corrected all deployment files to use new `extensions/webview/` path instead of old `extensions/vscode/src/webview/`
+- Updated install.php, index.php, and INSTALLATION.md (9 total corrections) ensuring universal compatibility with XAMPP, LAMP, MAMP, and shared hosting
+- Resolved installation issues where deployment scripts searched for chat.html in incorrect directory structure
