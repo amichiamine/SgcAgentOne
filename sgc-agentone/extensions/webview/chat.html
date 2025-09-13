@@ -515,6 +515,29 @@
                                     </button>
                                 </div>
                             </div>
+
+                            <!-- Bouton Changer de dossier -->
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <h4><i class="fas fa-folder-open"></i> Navigation</h4>
+                                <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 1rem;">
+                                    <label style="color: var(--foreground); font-weight: 500;">Dossier :</label>
+                                    <input type="text" id="folderPathInput" class="message-input" placeholder="Chemin du dossier (ex: ., ../autre-projet, /chemin/absolu)" value="." style="flex: 1; padding: 0.5rem;">
+                                    <button class="clay-button" id="changeFolderBtn" style="background: var(--primary); color: var(--background);">
+                                        <i class="fas fa-folder-open"></i> Changer
+                                    </button>
+                                </div>
+                                <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+                                    <button class="clay-button" id="parentFolderBtn" title="Dossier parent">
+                                        <i class="fas fa-arrow-up"></i> Parent
+                                    </button>
+                                    <button class="clay-button" id="homeFolderBtn" title="Racine du projet">
+                                        <i class="fas fa-home"></i> Racine
+                                    </button>
+                                    <span style="color: var(--muted-foreground); font-size: 0.9rem; align-self: center; margin-left: auto;">
+                                        Actuel: <span id="currentFolderDisplay">.</span>
+                                    </span>
+                                </div>
+                            </div>
                             
                             <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
                                 <h4>📂 Répertoire projet</h4>
@@ -1188,6 +1211,41 @@
             return await sendAPIMessage(message);
         }
         
+        // Fonction pour changer le dossier de projet
+        async function changeProjectFolder(newPath) {
+            try {
+                // Nettoyer et normaliser le chemin
+                let cleanPath = newPath.trim();
+                if (cleanPath === '') cleanPath = '.';
+                
+                // Test si le dossier existe via l'API files
+                const response = await fetch(`/api/files/list?dir=${encodeURIComponent(cleanPath)}`, {
+                    headers: {
+                        'X-API-Key': await getAuthToken() || 'development'
+                    }
+                });
+                
+                if (response.ok) {
+                    // Mettre à jour l'interface
+                    const folderPathInput = document.getElementById('folderPathInput');
+                    const currentFolderDisplay = document.getElementById('currentFolderDisplay');
+                    
+                    if (folderPathInput) folderPathInput.value = cleanPath;
+                    if (currentFolderDisplay) currentFolderDisplay.textContent = cleanPath;
+                    
+                    // Rafraîchir la liste des fichiers
+                    await loadFileTree(cleanPath);
+                    
+                    showAPIMessage(`Dossier changé vers: ${cleanPath}`, 'success');
+                } else {
+                    throw new Error(`Dossier inaccessible: ${cleanPath}`);
+                }
+            } catch (error) {
+                console.error('Erreur changement de dossier:', error);
+                showAPIMessage(`Erreur: ${error.message}`, 'error');
+            }
+        }
+        
         function showAPIMessage(text, type = 'info') {
             const messagesContainer = document.getElementById('messages');
             if (!messagesContainer) return;
@@ -1303,6 +1361,46 @@
                 refreshFilesBtn.addEventListener('click', async () => {
                     console.log('Actualisation de l\'arborescence');
                     await sendAPIMessage('Actualise la liste des fichiers du projet');
+                });
+            }
+            
+            // Boutons de navigation de dossier
+            const changeFolderBtn = document.getElementById('changeFolderBtn');
+            const parentFolderBtn = document.getElementById('parentFolderBtn');
+            const homeFolderBtn = document.getElementById('homeFolderBtn');
+            const folderPathInput = document.getElementById('folderPathInput');
+            const currentFolderDisplay = document.getElementById('currentFolderDisplay');
+            
+            if (changeFolderBtn && folderPathInput) {
+                changeFolderBtn.addEventListener('click', async () => {
+                    const newPath = folderPathInput.value.trim();
+                    if (newPath) {
+                        await changeProjectFolder(newPath);
+                    }
+                });
+                
+                // Permettre l'utilisation d'Entrée pour changer de dossier
+                folderPathInput.addEventListener('keypress', async (e) => {
+                    if (e.key === 'Enter') {
+                        const newPath = folderPathInput.value.trim();
+                        if (newPath) {
+                            await changeProjectFolder(newPath);
+                        }
+                    }
+                });
+            }
+            
+            if (parentFolderBtn) {
+                parentFolderBtn.addEventListener('click', async () => {
+                    const currentPath = folderPathInput.value || '.';
+                    const parentPath = currentPath === '.' ? '..' : `${currentPath}/..`;
+                    await changeProjectFolder(parentPath);
+                });
+            }
+            
+            if (homeFolderBtn) {
+                homeFolderBtn.addEventListener('click', async () => {
+                    await changeProjectFolder('.');
                 });
             }
             
