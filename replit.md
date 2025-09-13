@@ -90,3 +90,6 @@ Custom "SGC-Commander" theme with:
 - **FIXED: Deployment path consistency** - Corrected all deployment files to use new `extensions/webview/` path instead of old `extensions/vscode/src/webview/`
 - Updated install.php, index.php, and INSTALLATION.md (9 total corrections) ensuring universal compatibility with XAMPP, LAMP, MAMP, and shared hosting
 - Resolved installation issues where deployment scripts searched for chat.html in incorrect directory structure
+- **FIXED: CSS styling on XAMPP/shared hosting** - Corrected relative paths in chat.html for theme CSS files
+- Changed CSS links from `extensions/webview/theme/` to `theme/` for proper loading on XAMPP, LAMP, MAMP, and shared hosting environments
+- Ensured visual consistency across all deployment environments with complete SGC-Commander theme application
