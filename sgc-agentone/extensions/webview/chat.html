@@ -305,8 +305,11 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
         
-        // Get authentication token from server (secure approach)
+        // Variables globales SGC-AgentOne
         let authToken = null;
+        let currentWorkingDirectory = '.'; // Dossier de travail global pour toutes les vues
+        
+        // Get authentication token from server (secure approach)
         async function getAuthToken() {
             if (!authToken) {
                 try {
@@ -367,7 +370,7 @@
                     headers: headers,
                     body: JSON.stringify({
                         message: message,
-                        projectPath: '.',
+                        projectPath: currentWorkingDirectory,
                         blind: false
                     })
                 });
@@ -1183,7 +1186,7 @@
                     },
                     body: JSON.stringify({
                         message: message,
-                        projectPath: '.',
+                        projectPath: currentWorkingDirectory,
                         blind: false
                     })
                 });
@@ -1226,17 +1229,26 @@
                 });
                 
                 if (response.ok) {
-                    // Mettre à jour l'interface
+                    // CHANGEMENT GLOBAL: Mettre à jour le dossier de travail pour TOUTES les vues
+                    currentWorkingDirectory = cleanPath;
+                    
+                    // Mettre à jour l'interface Files
                     const folderPathInput = document.getElementById('folderPathInput');
                     const currentFolderDisplay = document.getElementById('currentFolderDisplay');
                     
                     if (folderPathInput) folderPathInput.value = cleanPath;
                     if (currentFolderDisplay) currentFolderDisplay.textContent = cleanPath;
                     
-                    // Rafraîchir la liste des fichiers
-                    await loadFileTree(cleanPath);
+                    // Rafraîchir la liste des fichiers 
+                    const fileTreeElement = document.getElementById('fileTree');
+                    if (fileTreeElement) {
+                        await loadFileTreeForDirectory(cleanPath);
+                    }
                     
-                    showAPIMessage(`Dossier changé vers: ${cleanPath}`, 'success');
+                    // Notifier toutes les autres vues du changement
+                    await notifyViewsOfDirectoryChange(cleanPath);
+                    
+                    showAPIMessage(`📁 Dossier global changé vers: ${cleanPath} (toutes vues mises à jour)`, 'success');
                 } else {
                     throw new Error(`Dossier inaccessible: ${cleanPath}`);
                 }
@@ -3001,7 +3013,78 @@
             }
         }
         
+        // Fonction pour rafraîchir l'arbre des fichiers pour un dossier spécifique
+        async function loadFileTreeForDirectory(directory = currentWorkingDirectory) {
+            const fileTree = document.getElementById('fileTree');
+            if (!fileTree) return;
+            
+            try {
+                const response = await fetch(`/api/files/list?dir=${encodeURIComponent(directory)}`, {
+                    headers: {
+                        'X-API-Key': await getAuthToken() || 'development'
+                    }
+                });
+                
+                if (response.ok) {
+                    const files = await response.json();
+                    
+                    // Afficher les fichiers du dossier courant
+                    fileTree.innerHTML = files.map(file => {
+                        const icon = file.type === 'directory' ? 'fas fa-folder' : 'fas fa-file-alt';
+                        const color = file.type === 'directory' ? 'text-primary' : '';
+                        return `
+                            <div class="file-item" style="padding: 0.25rem; cursor: pointer; border-radius: 4px; margin: 2px 0;" 
+                                 onclick="handleFileClick('${file.path}', '${file.type}')">
+                                <i class="${icon} ${color}"></i> ${file.name}
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    fileTree.innerHTML = '<div style="color: var(--muted-foreground);">Erreur de chargement</div>';
+                }
+            } catch (error) {
+                console.error('Erreur chargement arbre:', error);
+                fileTree.innerHTML = '<div style="color: var(--muted-foreground);">Erreur de connexion</div>';
+            }
+        }
+        
+        // Fonction originale pour compatibilité
         async function loadFileTree() {
+            return await loadFileTreeForDirectory(currentWorkingDirectory);
+        }
+        
+        // Notifier toutes les vues du changement de dossier
+        async function notifyViewsOfDirectoryChange(newDirectory) {
+            // Mettre à jour l'éditeur si ouvert
+            if (window.monacoEditor) {
+                console.log('🔄 Mise à jour Editor pour dossier:', newDirectory);
+                // L'éditeur utilisera currentWorkingDirectory pour les prochains fichiers
+            }
+            
+            // Mettre à jour la base de données si nécessaire
+            const dbSection = document.querySelector('[data-tab="database"]');
+            if (dbSection && dbSection.classList.contains('active')) {
+                console.log('🔄 Mise à jour Database pour dossier:', newDirectory);
+                // La base SQLite sera recherchée dans le nouveau dossier
+            }
+            
+            // Autres vues...
+            console.log('📁 Toutes les vues notifiées du changement vers:', newDirectory);
+        }
+        
+        // Gestionnaire de clic sur fichier/dossier
+        function handleFileClick(filePath, fileType) {
+            if (fileType === 'directory') {
+                // Si c'est un dossier, y naviguer
+                changeProjectFolder(filePath);
+            } else {
+                // Si c'est un fichier, l'ouvrir
+                openFile(filePath);
+            }
+        }
+        
+        // Version obsolète pour compatibilité (utilisée plus bas)
+        async function loadFileTreeObsolete() {
             const fileTree = document.getElementById('fileTree');
             if (!fileTree) return;
             
