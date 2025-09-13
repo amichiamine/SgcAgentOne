@@ -57,3 +57,19 @@ Custom "SGC-Commander" theme with:
 ## Security Services
 - **CORS Configuration**: Built-in support for cross-origin requests
 - **API Authentication**: Custom API key system for request validation
+
+## Deployment Systems
+- **Development Server**: PHP built-in server for Replit environment
+- **Plug & Play Package**: Universal deployment system for Apache/PHP environments (XAMPP, LAMP, MAMP, web hosting)
+
+# Recent Changes
+
+## Latest Modifications (September 2025)
+- Successfully implemented and tested intelligent "Help" system in chat interface with 3 commands: "help" (main menu), "help chat" (detailed chat guide), "help ide" (complete IDE guide)
+- Created help action files (showHelpMenu.php, showChatHelp.php, showIdeHelp.php) with smart content extraction from existing .md documentation files
+- Enhanced interpreter logic with exact pattern matching for help commands, resolving previous matching conflicts
+- Confirmed multi-language support (French/English) for all help commands with 9 pattern variations
+- **NEW: Created SGC-AgentOne Plug & Play deployment system** - Universal compatibility package for all Apache/PHP environments
+- Renamed deployment/shared-hosting to deployment/plugandplay with enhanced documentation covering XAMPP, LAMP, MAMP, and web hosting
+- Added automatic installation script (install.php) with environment diagnostics and file creation
+- Updated documentation for universal compatibility: local development (XAMPP/LAMP/MAMP) and web hosting deployment

@@ -1,14 +1,19 @@
 <?php
 /**
- * SGC-AgentOne - Script d'installation automatique pour hébergement mutualisé
+ * SGC-AgentOne Plug & Play - Script d'installation automatique universelle
+ * Compatible: Hébergement web, XAMPP, LAMP, MAMP
  * Lance depuis le dossier sgc-agentone/ pour configurer l'environnement
  */
 
 // Configuration
-$projectRoot = dirname(__FILE__, 3); // Remonte de 3 niveaux depuis deployment/shared-hosting/
-$installPath = dirname($projectRoot) . '/sgc-agentone'; // public_html/sgc-agentone/
+$projectRoot = dirname(__FILE__, 3); // Remonte de 3 niveaux depuis deployment/plugandplay/
+$installPath = dirname($projectRoot) . '/sgc-agentone'; // Répertoire d'installation
 
-echo "🚀 <strong>SGC-AgentOne - Installation Automatique</strong><br><br>";
+echo "🔌 <strong>SGC-AgentOne Plug & Play - Installation Automatique</strong><br><br>";
+echo "<div style='background: #e8f4fd; padding: 10px; border-left: 4px solid #2196F3; margin-bottom: 15px;'>";
+echo "✨ <strong>Compatible avec tous les environnements :</strong><br>";
+echo "🌐 Hébergement web mutualisé • 🖥️ XAMPP • 🐧 LAMP • 🍎 MAMP";
+echo "</div>";
 
 // Vérification de l'environnement
 function checkEnvironment() {
