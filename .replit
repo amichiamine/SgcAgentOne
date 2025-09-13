@@ -48,4 +48,4 @@ packages = ["sqlite"]
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["php", "sgc-agentone/core/server.php"]
+run = ["php", "-S", "0.0.0.0:5000", "-t", ".", "sgc-agentone/core/router.php"]
