@@ -224,6 +224,12 @@ class SGCBrowser {
     }
 
     isValidUrl(url) {
+        // Accepter les URLs relatives (commencent par /)
+        if (url.startsWith('/')) {
+            return true;
+        }
+        
+        // Vérifier les URLs absolues
         try {
             new URL(url);
             return true;
