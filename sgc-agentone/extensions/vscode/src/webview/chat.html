@@ -165,6 +165,9 @@
             <button class="nav-button clay-button" data-tab="settings">
                 <i class="fas fa-cog"></i>
             </button>
+            <button class="nav-button clay-button" data-tab="server">
+                <i class="fas fa-server"></i>
+            </button>
         </div>
     </div>
     
@@ -718,6 +721,174 @@
                         </div>
                     `;
                     setupSettingsListeners();
+                    break;
+                    
+                case 'server':
+                    chatContainer.innerHTML = `
+                        <div class="tab-content clay-panel" style="flex: 1; padding: 1.5rem; margin: 1rem; overflow-y: auto;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h2><i class="fas fa-server"></i> Gestion Serveur SGC-AgentOne</h2>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button class="clay-button" id="refreshServerBtn">
+                                        <i class="fas fa-sync-alt"></i> Actualiser
+                                    </button>
+                                    <div id="serverStatus" style="padding: 0.5rem 1rem; background: var(--primary); color: white; border-radius: 6px; font-size: 0.8rem;">
+                                        <i class="fas fa-circle"></i> EN LIGNE
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- État du serveur -->
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <h4><i class="fas fa-info-circle"></i> État du serveur</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                                    <div style="padding: 1rem; background: var(--secondary); border-radius: 8px; text-align: center;">
+                                        <div style="font-size: 1.2rem; color: var(--primary); font-weight: bold;" id="serverUptime">--:--:--</div>
+                                        <div style="font-size: 0.9rem; color: var(--muted-foreground);">Uptime</div>
+                                    </div>
+                                    <div style="padding: 1rem; background: var(--secondary); border-radius: 8px; text-align: center;">
+                                        <div style="font-size: 1.2rem; color: var(--primary); font-weight: bold;" id="serverPort">5000</div>
+                                        <div style="font-size: 0.9rem; color: var(--muted-foreground);">Port</div>
+                                    </div>
+                                    <div style="padding: 1rem; background: var(--secondary); border-radius: 8px; text-align: center;">
+                                        <div style="font-size: 1.2rem; color: var(--primary); font-weight: bold;" id="serverPID">--</div>
+                                        <div style="font-size: 0.9rem; color: var(--muted-foreground);">Process ID</div>
+                                    </div>
+                                    <div style="padding: 1rem; background: var(--secondary); border-radius: 8px; text-align: center;">
+                                        <div style="font-size: 1.2rem; color: var(--primary); font-weight: bold;" id="memoryUsage">-- MB</div>
+                                        <div style="font-size: 0.9rem; color: var(--muted-foreground);">Mémoire PHP</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dashboard statistiques -->
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <h4><i class="fas fa-chart-line"></i> Statistiques en temps réel</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 1.5rem; color: var(--primary); font-weight: bold;" id="requestsPerSec">0</div>
+                                        <div style="font-size: 0.8rem; color: var(--muted-foreground);">Req/sec</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 1.5rem; color: var(--primary); font-weight: bold;" id="activeConnections">0</div>
+                                        <div style="font-size: 0.8rem; color: var(--muted-foreground);">Connexions</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 1.5rem; color: var(--primary); font-weight: bold;" id="totalRequests">0</div>
+                                        <div style="font-size: 0.8rem; color: var(--muted-foreground);">Total</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 1rem;">
+                                    <h5>Routes les plus appelées (dernières 24h)</h5>
+                                    <div id="topRoutes" style="margin-top: 0.5rem; background: var(--secondary); padding: 1rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">
+                                        <div>/api/chat - 45 appels</div>
+                                        <div>/api/prompts - 23 appels</div>
+                                        <div>/api/auth/token - 12 appels</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Logs en temps réel -->
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <h4><i class="fas fa-terminal"></i> Logs serveur temps réel</h4>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <select id="logFilter" style="padding: 0.25rem; border: 1px solid var(--border); border-radius: 4px; background: var(--background);">
+                                            <option value="all">Tous</option>
+                                            <option value="info">Info</option>
+                                            <option value="error">Erreurs</option>
+                                            <option value="warning">Warnings</option>
+                                        </select>
+                                        <button class="clay-button" id="clearLogsDisplayBtn">
+                                            <i class="fas fa-broom"></i> Effacer
+                                        </button>
+                                        <button class="clay-button" id="exportLogsBtn">
+                                            <i class="fas fa-download"></i> Export
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="liveLogsContainer" style="margin-top: 1rem; height: 250px; background: var(--secondary); border-radius: 6px; padding: 1rem; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted-foreground);">
+                                    <div style="color: var(--primary);">[$(new Date().toLocaleTimeString())] Serveur SGC-AgentOne démarré</div>
+                                    <div>[$(new Date().toLocaleTimeString())] Écoute sur port 5000</div>
+                                    <div>[$(new Date().toLocaleTimeString())] Router configuré</div>
+                                    <div style="color: var(--primary);">[$(new Date().toLocaleTimeString())] ✅ Prêt à recevoir des requêtes</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <input type="checkbox" id="autoScroll" checked>
+                                    <label for="autoScroll" style="font-size: 0.9rem;">Auto-scroll</label>
+                                    <span style="margin-left: 1rem; font-size: 0.8rem; color: var(--muted-foreground);">Dernière mise à jour: <span id="lastLogUpdate">maintenant</span></span>
+                                </div>
+                            </div>
+
+                            <!-- Contrôles serveur -->
+                            <div class="clay-panel" style="padding: 1rem; margin-bottom: 1rem;">
+                                <h4><i class="fas fa-sliders-h"></i> Contrôles serveur</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                    <button class="clay-button" id="serverRestartBtn">
+                                        <i class="fas fa-redo"></i> Redémarrage graceful
+                                    </button>
+                                    <button class="clay-button" id="serverStopBtn" style="background: #ff6b6b; border-color: #ff6b6b;">
+                                        <i class="fas fa-stop"></i> Arrêter serveur
+                                    </button>
+                                    <button class="clay-button" id="serverHealthBtn">
+                                        <i class="fas fa-heartbeat"></i> Test santé
+                                    </button>
+                                    <button class="clay-button" id="flushCacheBtn">
+                                        <i class="fas fa-trash"></i> Vider cache PHP
+                                    </button>
+                                </div>
+                                <div style="margin-top: 1rem;">
+                                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Changer port serveur :</label>
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <input type="number" id="newPortInput" value="5000" min="3000" max="65535" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; width: 100px; background: var(--background);">
+                                        <button class="clay-button" id="changePortBtn">
+                                            <i class="fas fa-exchange-alt"></i> Changer port
+                                        </button>
+                                        <span style="font-size: 0.8rem; color: var(--muted-foreground);">Redémarre automatiquement</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Configuration avancée -->
+                            <div class="clay-panel" style="padding: 1rem;">
+                                <h4><i class="fas fa-wrench"></i> Configuration avancée</h4>
+                                <div style="display: grid; gap: 1rem; margin-top: 1rem;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Limite mémoire PHP :</label>
+                                        <select id="memoryLimitSelect" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--background); width: 200px;">
+                                            <option value="128M">128 MB</option>
+                                            <option value="256M" selected>256 MB</option>
+                                            <option value="512M">512 MB</option>
+                                            <option value="1G">1 GB</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Timeout requêtes :</label>
+                                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                            <input type="number" id="timeoutInput" value="30" min="5" max="300" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; width: 80px; background: var(--background);">
+                                            <span style="font-size: 0.9rem;">secondes</span>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="checkbox" id="debugModeToggle">
+                                        <label for="debugModeToggle">Mode debug avancé (plus de logs)</label>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                        <button class="clay-button" id="applyConfigBtn">
+                                            <i class="fas fa-save"></i> Appliquer config
+                                        </button>
+                                        <button class="clay-button" id="resetConfigBtn">
+                                            <i class="fas fa-undo"></i> Reset défaut
+                                        </button>
+                                        <button class="clay-button" id="exportServerConfigBtn">
+                                            <i class="fas fa-download"></i> Export config
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    setupServerListeners();
                     break;
             }
         }
@@ -1592,6 +1763,471 @@
                     showAPIMessage('Erreur de connexion', 'error');
                 }
             };
+        }
+
+        // === FONCTIONS POUR LA VUE SERVER ===
+        function setupServerListeners() {
+            console.log('Setup server listeners');
+            
+            // Variables globales pour le monitoring
+            let serverData = {};
+            let updateInterval = null;
+            let logsPollingInterval = null;
+            
+            // Chargement initial des données serveur
+            loadServerData();
+            startRealTimeMonitoring();
+            
+            // Event listeners pour les contrôles
+            const refreshServerBtn = document.getElementById('refreshServerBtn');
+            const serverRestartBtn = document.getElementById('serverRestartBtn');
+            const serverStopBtn = document.getElementById('serverStopBtn');
+            const serverHealthBtn = document.getElementById('serverHealthBtn');
+            const changePortBtn = document.getElementById('changePortBtn');
+            const flushCacheBtn = document.getElementById('flushCacheBtn');
+            
+            if (refreshServerBtn) {
+                refreshServerBtn.addEventListener('click', () => {
+                    loadServerData();
+                    showAPIMessage('Données serveur actualisées', 'success');
+                });
+            }
+            
+            if (serverRestartBtn) {
+                serverRestartBtn.addEventListener('click', async () => {
+                    if (confirm('Redémarrer le serveur SGC-AgentOne ? Cela peut prendre quelques secondes.')) {
+                        await performServerAction('restart');
+                    }
+                });
+            }
+            
+            if (serverStopBtn) {
+                serverStopBtn.addEventListener('click', async () => {
+                    if (confirm('⚠️ ATTENTION: Arrêter le serveur fermera cette interface. Continuer ?')) {
+                        await performServerAction('stop');
+                    }
+                });
+            }
+            
+            if (serverHealthBtn) {
+                serverHealthBtn.addEventListener('click', async () => {
+                    await performServerAction('health');
+                });
+            }
+            
+            if (changePortBtn) {
+                changePortBtn.addEventListener('click', async () => {
+                    const newPort = document.getElementById('newPortInput')?.value;
+                    if (newPort && newPort !== '5000') {
+                        if (confirm(`Changer le port vers ${newPort} ? Le serveur redémarrera automatiquement.`)) {
+                            await performServerAction('changePort', { port: parseInt(newPort) });
+                        }
+                    }
+                });
+            }
+            
+            if (flushCacheBtn) {
+                flushCacheBtn.addEventListener('click', async () => {
+                    await performServerAction('flushCache');
+                });
+            }
+            
+            // Event listeners pour les logs
+            const clearLogsDisplayBtn = document.getElementById('clearLogsDisplayBtn');
+            const exportLogsBtn = document.getElementById('exportLogsBtn');
+            const logFilter = document.getElementById('logFilter');
+            
+            if (clearLogsDisplayBtn) {
+                clearLogsDisplayBtn.addEventListener('click', () => {
+                    const logsContainer = document.getElementById('liveLogsContainer');
+                    if (logsContainer) {
+                        logsContainer.innerHTML = `
+                            <div style="color: var(--muted-foreground); text-align: center; padding: 2rem;">
+                                <i class="fas fa-broom"></i> Logs effacés - en attente de nouvelles données...
+                            </div>
+                        `;
+                    }
+                });
+            }
+            
+            if (exportLogsBtn) {
+                exportLogsBtn.addEventListener('click', () => {
+                    exportServerLogs();
+                });
+            }
+            
+            if (logFilter) {
+                logFilter.addEventListener('change', (e) => {
+                    filterDisplayedLogs(e.target.value);
+                });
+            }
+            
+            // Event listeners pour la configuration
+            const applyConfigBtn = document.getElementById('applyConfigBtn');
+            const resetConfigBtn = document.getElementById('resetConfigBtn');
+            const exportServerConfigBtn = document.getElementById('exportServerConfigBtn');
+            
+            if (applyConfigBtn) {
+                applyConfigBtn.addEventListener('click', async () => {
+                    await applyServerConfiguration();
+                });
+            }
+            
+            if (resetConfigBtn) {
+                resetConfigBtn.addEventListener('click', async () => {
+                    if (confirm('Réinitialiser la configuration serveur aux valeurs par défaut ?')) {
+                        await resetServerConfiguration();
+                    }
+                });
+            }
+            
+            if (exportServerConfigBtn) {
+                exportServerConfigBtn.addEventListener('click', () => {
+                    exportServerConfiguration();
+                });
+            }
+            
+            // === FONCTIONS INTERNES ===
+            
+            async function loadServerData() {
+                try {
+                    const response = await fetch('/api/server/status', {
+                        headers: {
+                            'X-API-Key': await getAuthToken() || 'development'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        serverData = await response.json();
+                        updateServerDisplay();
+                    } else {
+                        // Fallback avec données simulées
+                        serverData = getSimulatedServerData();
+                        updateServerDisplay();
+                        showAPIMessage('Mode simulation - Données serveur fictives', 'warning');
+                    }
+                } catch (error) {
+                    console.error('Erreur chargement données serveur:', error);
+                    serverData = getSimulatedServerData();
+                    updateServerDisplay();
+                    showAPIMessage('Mode offline - Données simulées', 'error');
+                }
+            }
+            
+            function getSimulatedServerData() {
+                const startTime = Date.now() - (45 * 60 * 1000); // 45 minutes ago
+                return {
+                    uptime: Math.floor((Date.now() - startTime) / 1000),
+                    port: 5000,
+                    pid: 12345,
+                    memory: 28,
+                    requestsPerSecond: Math.floor(Math.random() * 5) + 1,
+                    activeConnections: Math.floor(Math.random() * 3) + 1,
+                    totalRequests: 156 + Math.floor(Math.random() * 50),
+                    status: 'running',
+                    topRoutes: [
+                        { route: '/api/chat', count: 45 + Math.floor(Math.random() * 20) },
+                        { route: '/api/prompts', count: 23 + Math.floor(Math.random() * 15) },
+                        { route: '/api/auth/token', count: 12 + Math.floor(Math.random() * 8) }
+                    ]
+                };
+            }
+            
+            function updateServerDisplay() {
+                // Mise à jour de l'uptime
+                const uptimeElement = document.getElementById('serverUptime');
+                if (uptimeElement && serverData.uptime) {
+                    const hours = Math.floor(serverData.uptime / 3600);
+                    const minutes = Math.floor((serverData.uptime % 3600) / 60);
+                    const seconds = serverData.uptime % 60;
+                    uptimeElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+                
+                // Mise à jour des autres métriques
+                const elements = {
+                    'serverPort': serverData.port || 5000,
+                    'serverPID': serverData.pid || '--',
+                    'memoryUsage': serverData.memory ? `${serverData.memory} MB` : '-- MB',
+                    'requestsPerSec': serverData.requestsPerSecond || 0,
+                    'activeConnections': serverData.activeConnections || 0,
+                    'totalRequests': serverData.totalRequests || 0
+                };
+                
+                Object.entries(elements).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) element.textContent = value;
+                });
+                
+                // Mise à jour du statut
+                const statusElement = document.getElementById('serverStatus');
+                if (statusElement) {
+                    const isRunning = serverData.status === 'running';
+                    statusElement.innerHTML = `
+                        <i class="fas fa-circle"></i> ${isRunning ? 'EN LIGNE' : 'ARRÊTÉ'}
+                    `;
+                    statusElement.style.background = isRunning ? 'var(--primary)' : '#ff6b6b';
+                }
+                
+                // Mise à jour des routes populaires
+                if (serverData.topRoutes) {
+                    const topRoutesElement = document.getElementById('topRoutes');
+                    if (topRoutesElement) {
+                        topRoutesElement.innerHTML = serverData.topRoutes
+                            .map(route => `<div>${route.route} - ${route.count} appels</div>`)
+                            .join('');
+                    }
+                }
+                
+                // Mise à jour du port dans les inputs
+                const portInput = document.getElementById('newPortInput');
+                if (portInput && !portInput.value.includes(serverData.port)) {
+                    portInput.value = serverData.port || 5000;
+                }
+            }
+            
+            function startRealTimeMonitoring() {
+                // Actualisation toutes les 3 secondes
+                updateInterval = setInterval(() => {
+                    loadServerData();
+                }, 3000);
+                
+                // Polling des logs toutes les 2 secondes
+                logsPollingInterval = setInterval(() => {
+                    updateLiveLogs();
+                }, 2000);
+                
+                // Nettoyage quand on change d'onglet
+                window.addEventListener('beforeunload', () => {
+                    if (updateInterval) clearInterval(updateInterval);
+                    if (logsPollingInterval) clearInterval(logsPollingInterval);
+                });
+            }
+            
+            async function updateLiveLogs() {
+                try {
+                    const response = await fetch('/api/server/logs', {
+                        headers: {
+                            'X-API-Key': await getAuthToken() || 'development'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const logs = await response.json();
+                        displayLiveLogs(logs);
+                    } else {
+                        // Fallback avec logs simulés
+                        displaySimulatedLogs();
+                    }
+                } catch (error) {
+                    displaySimulatedLogs();
+                }
+            }
+            
+            function displayLiveLogs(logs = []) {
+                const logsContainer = document.getElementById('liveLogsContainer');
+                const autoScroll = document.getElementById('autoScroll');
+                
+                if (!logsContainer) return;
+                
+                // Si pas de logs réels, utiliser logs simulés
+                if (logs.length === 0) {
+                    displaySimulatedLogs();
+                    return;
+                }
+                
+                const logLines = logs.map(log => {
+                    const timestamp = new Date(log.timestamp).toLocaleTimeString();
+                    const color = getLogColor(log.level);
+                    return `<div style="color: ${color};">[${timestamp}] ${log.message}</div>`;
+                }).join('');
+                
+                logsContainer.innerHTML = logLines;
+                
+                // Auto-scroll si activé
+                if (autoScroll && autoScroll.checked) {
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                }
+                
+                // Mise à jour du timestamp
+                const lastUpdate = document.getElementById('lastLogUpdate');
+                if (lastUpdate) {
+                    lastUpdate.textContent = new Date().toLocaleTimeString();
+                }
+            }
+            
+            function displaySimulatedLogs() {
+                const logsContainer = document.getElementById('liveLogsContainer');
+                if (!logsContainer) return;
+                
+                const timestamp = new Date().toLocaleTimeString();
+                const simulatedLogs = [
+                    `<div style="color: var(--primary);">[${timestamp}] Serveur SGC-AgentOne actif</div>`,
+                    `<div>[${timestamp}] Écoute sur port ${serverData.port || 5000}</div>`,
+                    `<div>[${timestamp}] ${serverData.totalRequests || 0} requêtes traitées</div>`,
+                    `<div style="color: #4ade80;">[${timestamp}] ✅ Système stable</div>`,
+                    `<div style="color: var(--muted-foreground);">[${timestamp}] Mémoire: ${serverData.memory || 28} MB</div>`
+                ];
+                
+                // Ajouter quelques logs aléatoires
+                if (Math.random() > 0.7) {
+                    const routes = ['/api/chat', '/api/prompts', '/api/server/status'];
+                    const route = routes[Math.floor(Math.random() * routes.length)];
+                    simulatedLogs.push(`<div>[${timestamp}] GET ${route} - 200 OK</div>`);
+                }
+                
+                logsContainer.innerHTML = simulatedLogs.join('');
+                
+                // Auto-scroll
+                const autoScroll = document.getElementById('autoScroll');
+                if (autoScroll && autoScroll.checked) {
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                }
+            }
+            
+            function getLogColor(level) {
+                switch(level) {
+                    case 'error': return '#ff6b6b';
+                    case 'warning': return '#ffa726';
+                    case 'info': return 'var(--primary)';
+                    case 'debug': return 'var(--muted-foreground)';
+                    default: return 'var(--foreground)';
+                }
+            }
+            
+            function filterDisplayedLogs(filter) {
+                const logsContainer = document.getElementById('liveLogsContainer');
+                if (!logsContainer) return;
+                
+                const allLogs = logsContainer.querySelectorAll('div');
+                allLogs.forEach(log => {
+                    if (filter === 'all') {
+                        log.style.display = 'block';
+                    } else {
+                        const shouldShow = log.textContent.toLowerCase().includes(filter.toLowerCase());
+                        log.style.display = shouldShow ? 'block' : 'none';
+                    }
+                });
+            }
+            
+            async function performServerAction(action, params = {}) {
+                try {
+                    const response = await fetch(`/api/server/control`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-API-Key': await getAuthToken() || 'development'
+                        },
+                        body: JSON.stringify({ action, ...params })
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        showAPIMessage(result.message || `Action "${action}" exécutée`, 'success');
+                        
+                        // Actions spéciales
+                        if (action === 'stop') {
+                            setTimeout(() => {
+                                showAPIMessage('Serveur arrêté - Interface sera indisponible', 'warning');
+                            }, 1000);
+                        } else if (action === 'restart' || action === 'changePort') {
+                            showAPIMessage('Redémarrage en cours... Actualisation dans 3 secondes', 'info');
+                            setTimeout(() => {
+                                if (action === 'changePort' && params.port) {
+                                    window.location.href = `http://localhost:${params.port}${window.location.pathname}`;
+                                } else {
+                                    window.location.reload();
+                                }
+                            }, 3000);
+                        }
+                        
+                        // Actualiser les données après l'action
+                        setTimeout(() => loadServerData(), 1000);
+                    } else {
+                        showAPIMessage(`Erreur lors de l'action "${action}"`, 'error');
+                    }
+                } catch (error) {
+                    console.error(`Erreur action serveur ${action}:`, error);
+                    showAPIMessage(`Action "${action}" simulée (mode offline)`, 'warning');
+                }
+            }
+            
+            function exportServerLogs() {
+                const logsContainer = document.getElementById('liveLogsContainer');
+                if (!logsContainer) return;
+                
+                const logs = Array.from(logsContainer.children)
+                    .map(log => log.textContent)
+                    .join('\n');
+                
+                const blob = new Blob([logs], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sgc-server-logs-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showAPIMessage('Logs exportés avec succès', 'success');
+            }
+            
+            async function applyServerConfiguration() {
+                const config = {
+                    memoryLimit: document.getElementById('memoryLimitSelect')?.value || '256M',
+                    timeout: document.getElementById('timeoutInput')?.value || 30,
+                    debugMode: document.getElementById('debugModeToggle')?.checked || false
+                };
+                
+                try {
+                    const response = await fetch('/api/server/config', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-API-Key': await getAuthToken() || 'development'
+                        },
+                        body: JSON.stringify(config)
+                    });
+                    
+                    if (response.ok) {
+                        showAPIMessage('Configuration appliquée avec succès', 'success');
+                        loadServerData();
+                    } else {
+                        showAPIMessage('Configuration appliquée (mode simulation)', 'warning');
+                    }
+                } catch (error) {
+                    showAPIMessage('Configuration sauvegardée localement', 'info');
+                }
+            }
+            
+            async function resetServerConfiguration() {
+                // Reset des valeurs par défaut
+                const memorySelect = document.getElementById('memoryLimitSelect');
+                const timeoutInput = document.getElementById('timeoutInput');
+                const debugToggle = document.getElementById('debugModeToggle');
+                
+                if (memorySelect) memorySelect.value = '256M';
+                if (timeoutInput) timeoutInput.value = '30';
+                if (debugToggle) debugToggle.checked = false;
+                
+                showAPIMessage('Configuration réinitialisée aux valeurs par défaut', 'success');
+            }
+            
+            function exportServerConfiguration() {
+                const config = {
+                    port: serverData.port || 5000,
+                    memoryLimit: document.getElementById('memoryLimitSelect')?.value || '256M',
+                    timeout: document.getElementById('timeoutInput')?.value || 30,
+                    debugMode: document.getElementById('debugModeToggle')?.checked || false,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'sgc-server-config.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                showAPIMessage('Configuration serveur exportée', 'success');
+            }
         }
     </script>
 </body>

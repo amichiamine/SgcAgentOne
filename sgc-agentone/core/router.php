@@ -91,6 +91,20 @@ if (strpos($requestUri, '/api/chat') === 0 || $requestUri === '/api/chat') {
     }
 }
 
+if (strpos($requestUri, '/api/server') === 0 || $requestUri === '/api/server') {
+    // Inclusion de l'API server management
+    $serverApiFile = $projectRoot . '/sgc-agentone/core/api/server.php';
+    if (file_exists($serverApiFile)) {
+        include $serverApiFile;
+        exit();
+    } else {
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'API server non disponible']);
+        exit();
+    }
+}
+
 if (strpos($requestUri, '/api/prompts') === 0 || $requestUri === '/api/prompts') {
     // Inclusion de l'API prompts
     $promptsApiFile = $projectRoot . '/sgc-agentone/core/api/prompts.php';
