@@ -139,7 +139,7 @@ error_log("{$timestamp} {$requestMethod} {$requestUri}");
 
 // Route par défaut (page d'accueil)
 if ($requestUri === '/' || $requestUri === '/index.html') {
-    $chatInterface = $projectRoot . '/sgc-agentone/extensions/vscode/src/webview/chat.html';
+    $chatInterface = $projectRoot . '/sgc-agentone/extensions/webview/chat.html';
     if (file_exists($chatInterface)) {
         header('Content-Type: text/html; charset=utf-8');
         readfile($chatInterface);
