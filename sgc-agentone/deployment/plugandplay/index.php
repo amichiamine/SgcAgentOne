@@ -37,11 +37,11 @@ function detectEnvironment() {
     if (basename($info['current_dir']) === 'plugandplay') {
         // Script dans deployment/plugandplay/ - remonter vers sgc-agentone/
         $info['sgc_path'] = $scriptPath . '/../../..';
-        $info['interface_url'] = $info['sgc_path'] . '/extensions/vscode/src/webview/chat.html';
+        $info['interface_url'] = $info['sgc_path'] . '/extensions/webview/chat.html';
     } else {
         // Script copié à la racine de sgc-agentone/
         $info['sgc_path'] = $scriptPath;
-        $info['interface_url'] = $info['sgc_path'] . '/extensions/vscode/src/webview/chat.html';
+        $info['interface_url'] = $info['sgc_path'] . '/extensions/webview/chat.html';
     }
     
     return $info;
@@ -52,12 +52,12 @@ $env = detectEnvironment();
 
 // Vérification de l'installation SGC-AgentOne
 $coreCheck = $env['current_dir'] . '/core/router.php';
-$extensionsCheck = $env['current_dir'] . '/extensions/vscode/src/webview/chat.html';
+$extensionsCheck = $env['current_dir'] . '/extensions/webview/chat.html';
 
 // Si on est dans plugandplay, chercher au bon endroit
 if (basename($env['current_dir']) === 'plugandplay') {
     $coreCheck = dirname($env['current_dir'], 2) . '/core/router.php';
-    $extensionsCheck = dirname($env['current_dir'], 2) . '/extensions/vscode/src/webview/chat.html';
+    $extensionsCheck = dirname($env['current_dir'], 2) . '/extensions/webview/chat.html';
 }
 
 if (!file_exists($coreCheck) || !file_exists($extensionsCheck)) {

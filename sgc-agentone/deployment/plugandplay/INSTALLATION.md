@@ -86,12 +86,12 @@ sgc-agentone/
 
 **Hébergement web :**
 - **Interface principale :** `https://votre-site.com/sgc-agentone/`
-- **Chat direct :** `https://votre-site.com/sgc-agentone/extensions/vscode/src/webview/chat.html`
+- **Chat direct :** `https://votre-site.com/sgc-agentone/extensions/webview/chat.html`
 - **API :** `https://votre-site.com/sgc-agentone/api/chat`
 
 **XAMPP/LAMP/MAMP :**
 - **Interface principale :** `http://localhost/sgc-agentone/`
-- **Chat direct :** `http://localhost/sgc-agentone/extensions/vscode/src/webview/chat.html`
+- **Chat direct :** `http://localhost/sgc-agentone/extensions/webview/chat.html`
 - **API :** `http://localhost/sgc-agentone/api/chat`
 
 ### 5️⃣ Test de compatibilité

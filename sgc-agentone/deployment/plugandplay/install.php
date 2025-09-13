@@ -125,10 +125,10 @@ ini_set(\'log_errors\', 1);
 
 // Détection intelligente des chemins
 $currentPath = dirname($_SERVER[\'SCRIPT_NAME\']);
-$interfaceUrl = $currentPath . \'/extensions/vscode/src/webview/chat.html\';
+$interfaceUrl = $currentPath . \'/extensions/webview/chat.html\';
 
 // Vérification que l\'interface existe
-$interfaceFile = __DIR__ . \'/extensions/vscode/src/webview/chat.html\';
+$interfaceFile = __DIR__ . \'/extensions/webview/chat.html\';
 if (!file_exists($interfaceFile)) {
     // Interface non trouvée - affichage d\'erreur avec diagnostic
     ?>
@@ -274,7 +274,7 @@ $sgcPath = $env['base_url'];
 
 // Calcul des URLs d'accès selon l'environnement
 $mainUrl = $baseUrl . $sgcPath . '/';
-$chatUrl = $baseUrl . $sgcPath . '/extensions/vscode/src/webview/chat.html';
+$chatUrl = $baseUrl . $sgcPath . '/extensions/webview/chat.html';
 $apiUrl = $baseUrl . $sgcPath . '/api/chat';
 
 echo "<div style='background: #f0f8ff; padding: 15px; border-left: 4px solid #007cba;'>";
