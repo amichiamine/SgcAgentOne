@@ -65,6 +65,12 @@ Custom "SGC-Commander" theme with:
 # Recent Changes
 
 ## Latest Modifications (September 2025)
+- **NOUVEAU: Chemins 100% relatifs** - Conversion complète de tous les chemins absolus vers des chemins relatifs pour compatibilité universelle
+- Corrigé les fonctions getProjectInfo() et getApiBase() dans browser.js et files.js pour utiliser des chemins relatifs intelligents
+- Unifié la détection d'environnement (seulement .replit.dev = Replit, suppression confusion localhost)
+- Optimisé chat.html avec chemins relatifs fixes : themePath = './theme', apiPath = '../../api'
+- Éliminé toutes les constructions d'URL absolues dans les appels fetch() et références CSS
+- **Résultat** : Compatible XAMPP, LAMP, MAMP, hébergement mutualisé ET Replit avec chemins relatifs universels
 - Successfully implemented and tested intelligent "Help" system in chat interface with 3 commands: "help" (main menu), "help chat" (detailed chat guide), "help ide" (complete IDE guide)
 - Created help action files (showHelpMenu.php, showChatHelp.php, showIdeHelp.php) with smart content extraction from existing .md documentation files
 - Enhanced interpreter logic with exact pattern matching for help commands, resolving previous matching conflicts
