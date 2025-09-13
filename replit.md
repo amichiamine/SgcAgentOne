@@ -84,3 +84,6 @@ Custom "SGC-Commander" theme with:
 - Updated router.php to serve chat interface from the new simplified path structure
 - Maintained all functionality while reducing directory depth and improving maintainability
 - Confirmed all assets (CSS themes, JavaScript modules, HTML templates) load correctly from new locations
+- **NEW: Enhanced Browser view display** - Fixed iframe height issue in chat interface by implementing flex layout structure
+- Modified JavaScript in chat.html to use consistent flex-based layout for browser view matching other tabs
+- Improved user experience with properly sized web navigation area that fills available space dynamically
