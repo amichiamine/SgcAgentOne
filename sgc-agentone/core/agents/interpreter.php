@@ -111,6 +111,18 @@ function extractParams($message, $pattern, $action) {
             $params = extractFileParams($message, 'read');
             break;
             
+        case 'delete file':
+            $params = extractFileParams($message, 'delete');
+            break;
+            
+        case 'create folder':
+            $params = extractFolderParams($message, 'create');
+            break;
+            
+        case 'delete folder':
+            $params = extractFolderParams($message, 'delete');
+            break;
+            
         case 'execute query':
             $params = extractQueryParams($message);
             break;
@@ -156,6 +168,36 @@ function extractFileParams($message, $operation) {
             if (!isset($params['content'])) {
                 $params['content'] = getDefaultContent($ext);
             }
+        }
+    }
+    
+    return $params;
+}
+
+/**
+ * Extrait les paramètres liés aux dossiers
+ */
+function extractFolderParams($message, $operation) {
+    $params = [];
+    
+    // Recherche de nom de dossier
+    if (preg_match('/(?:dossier|folder|répertoire|directory)\s+([a-zA-Z0-9\-_\.\/]+)/', $message, $matches)) {
+        $params['foldername'] = $matches[1];
+    } elseif (preg_match('/(?:dans|vers|le)\s+([a-zA-Z0-9\-_\/]+)/', $message, $matches)) {
+        // Alternative pour les patterns comme "crée dans [nom]"
+        $params['foldername'] = $matches[1];
+    }
+    
+    // Pour la suppression, détecter si c'est récursif (français et anglais)
+    if ($operation === 'delete') {
+        if (strpos($message, 'avec contenu') !== false || 
+            strpos($message, 'récursif') !== false || 
+            strpos($message, 'force') !== false ||
+            strpos($message, 'tout') !== false ||
+            strpos($message, 'with content') !== false ||
+            strpos($message, 'recursive') !== false ||
+            strpos($message, 'all') !== false) {
+            $params['recursive'] = true;
         }
     }
     

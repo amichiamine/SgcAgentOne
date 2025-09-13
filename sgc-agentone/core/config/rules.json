@@ -98,5 +98,41 @@
     {
         "pattern": "aide",
         "action": "show help menu"
+    },
+    {
+        "pattern": "supprime le fichier *",
+        "action": "delete file"
+    },
+    {
+        "pattern": "delete file *",
+        "action": "delete file"
+    },
+    {
+        "pattern": "efface le fichier *",
+        "action": "delete file"
+    },
+    {
+        "pattern": "crée le dossier *",
+        "action": "create folder"
+    },
+    {
+        "pattern": "create folder *",
+        "action": "create folder"
+    },
+    {
+        "pattern": "ajoute le dossier *",
+        "action": "create folder"
+    },
+    {
+        "pattern": "supprime le dossier *",
+        "action": "delete folder"
+    },
+    {
+        "pattern": "delete folder *",
+        "action": "delete folder"
+    },
+    {
+        "pattern": "efface le dossier *",
+        "action": "delete folder"
     }
 ]
