@@ -241,6 +241,9 @@
             <button class="nav-button clay-button" data-tab="editor">
                 <i class="fas fa-code"></i>
             </button>
+            <button class="nav-button clay-button" data-tab="browser">
+                <i class="fas fa-globe"></i>
+            </button>
         </div>
     </div>
     
@@ -1057,6 +1060,16 @@
                     
                     // Chargement Monaco après création de l'interface
                     loadMonacoEditor();
+                    break;
+                    
+                case 'browser':
+                    chatContainer.innerHTML = `
+                        <iframe 
+                            src="browser.html" 
+                            style="width: 100%; height: 100%; border: none; border-radius: 8px;" 
+                            title="Navigateur web intégré">
+                        </iframe>
+                    `;
                     break;
             }
         }
