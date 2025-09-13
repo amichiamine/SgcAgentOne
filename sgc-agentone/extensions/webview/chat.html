@@ -294,28 +294,37 @@
         // Fonction de détection automatique du chemin de base de l'API
         function getApiBase() {
             const currentPath = window.location.pathname;
-            // Détecter le chemin de base en cherchant les marqueurs de structure
-            let basePath = '';
+            const hostname = window.location.hostname;
             
-            // Chercher le premier segment qui indique la structure du projet
+            // Cas spécial Replit : chemin commence par /extensions/, /deployment/ ou /core/
+            // mais on est à la racine du serveur
+            if (currentPath.startsWith('/extensions/') || 
+                currentPath.startsWith('/deployment/') || 
+                currentPath.startsWith('/core/') ||
+                hostname.includes('.replit.dev')) {
+                return '/api/';
+            }
+            
+            // Déploiement XAMPP/hébergement : détecter le sous-dossier
+            // Chercher les marqueurs de structure dans un sous-dossier
             const markers = ['/extensions/', '/deployment/', '/core/'];
             for (const marker of markers) {
-                if (currentPath.includes(marker)) {
-                    basePath = currentPath.substring(0, currentPath.indexOf(marker));
-                    break;
+                if (currentPath.includes(marker) && !currentPath.startsWith(marker)) {
+                    const basePath = currentPath.substring(0, currentPath.indexOf(marker));
+                    return basePath + '/api/';
                 }
             }
             
-            // Si aucun marqueur trouvé et chemin commence par /segment/, utiliser ce segment
-            if (!basePath && currentPath.match(/^\/[^/]+\//)) {
+            // Fallback : si chemin commence par /segment/, utiliser ce segment
+            if (currentPath.match(/^\/[^/]+\//)) {
                 const segments = currentPath.split('/');
                 if (segments.length > 1 && segments[1]) {
-                    basePath = '/' + segments[1];
+                    return '/' + segments[1] + '/api/';
                 }
             }
             
-            // Normaliser le chemin final
-            return basePath.replace(/\/+$/, '') + '/api/';
+            // Par défaut, racine
+            return '/api/';
         }
         
         // Variables globales
