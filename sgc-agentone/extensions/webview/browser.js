@@ -6,15 +6,28 @@
 // Fonction de détection automatique du chemin de base de l'API
 function getApiBase() {
     const currentPath = window.location.pathname;
-    // Détection si nous sommes dans un sous-dossier (XAMPP/hébergement)
-    if (currentPath.includes('/sgc-agentone/') || 
-        (currentPath.includes('/extensions/') && !currentPath.startsWith('/extensions/'))) {
-        // Déploiement XAMPP/hébergement - extraire le chemin de base
-        const basePath = currentPath.split('/extensions/')[0];
-        return basePath + '/api/';
+    // Détecter le chemin de base en cherchant les marqueurs de structure
+    let basePath = '';
+    
+    // Chercher le premier segment qui indique la structure du projet
+    const markers = ['/extensions/', '/deployment/', '/core/'];
+    for (const marker of markers) {
+        if (currentPath.includes(marker)) {
+            basePath = currentPath.substring(0, currentPath.indexOf(marker));
+            break;
+        }
     }
-    // Replit ou racine
-    return '/api/';
+    
+    // Si aucun marqueur trouvé et chemin commence par /segment/, utiliser ce segment
+    if (!basePath && currentPath.match(/^\/[^/]+\//)) {
+        const segments = currentPath.split('/');
+        if (segments.length > 1 && segments[1]) {
+            basePath = '/' + segments[1];
+        }
+    }
+    
+    // Normaliser le chemin final
+    return basePath.replace(/\/+$/, '') + '/api/';
 }
 
 class SGCBrowser {
@@ -38,7 +51,7 @@ class SGCBrowser {
 
     async initializeAuth() {
         try {
-            const response = await fetch(getApiBase() + 'auth', {
+            const response = await fetch(getApiBase() + 'auth/token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
