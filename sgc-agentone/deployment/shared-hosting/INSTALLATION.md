@@ -18,6 +18,13 @@ public_html/
 
 ### 2️⃣ Étapes d'installation
 
+#### 🤖 **Installation automatique (recommandée)** :
+1. **Uploadez le dossier sgc-agentone complet** dans public_html/sgc-agentone/
+2. **Visitez** `https://votre-site.com/sgc-agentone/deployment/shared-hosting/install.php`
+3. **Le script configure automatiquement** tous les fichiers nécessaires
+4. **Supprimez le dossier deployment/** après installation (optionnel)
+
+#### 📋 **Installation manuelle** :
 1. **Uploadez le dossier sgc-agentone complet** dans public_html/sgc-agentone/
 2. **Dans le dossier sgc-agentone/** copiez :
    - `.htaccess` depuis deployment/shared-hosting/.htaccess
