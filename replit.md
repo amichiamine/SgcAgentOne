@@ -80,3 +80,7 @@ Custom "SGC-Commander" theme with:
 - Features: address bar, web navigation, local project preview, bookmarks, quick access to dev resources
 - Enhanced security: frame-busting detection, error handling with "open in new tab" fallback for blocked sites
 - Fixed routing issues and asset path resolution for proper browser view integration
+- **NEW: Restructured file hierarchy** - Simplified webview file organization from `extensions/vscode/src/webview/` to `extensions/webview/`
+- Updated router.php to serve chat interface from the new simplified path structure
+- Maintained all functionality while reducing directory depth and improving maintainability
+- Confirmed all assets (CSS themes, JavaScript modules, HTML templates) load correctly from new locations
