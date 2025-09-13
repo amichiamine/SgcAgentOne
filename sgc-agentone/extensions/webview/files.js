@@ -3,6 +3,20 @@
  * Gestion de l'interface d'exploration des fichiers avec navigation entre dossiers
  */
 
+// Fonction de détection automatique du chemin de base de l'API
+function getApiBase() {
+    const currentPath = window.location.pathname;
+    // Détection si nous sommes dans un sous-dossier (XAMPP/hébergement)
+    if (currentPath.includes('/sgc-agentone/') || 
+        (currentPath.includes('/extensions/') && !currentPath.startsWith('/extensions/'))) {
+        // Déploiement XAMPP/hébergement - extraire le chemin de base
+        const basePath = currentPath.split('/extensions/')[0];
+        return basePath + '/api/';
+    }
+    // Replit ou racine
+    return '/api/';
+}
+
 class SGCFiles {
     constructor() {
         this.currentPath = '.';
@@ -122,7 +136,7 @@ class SGCFiles {
 
     async initializeAuth() {
         try {
-            const response = await fetch('/api/auth', {
+            const response = await fetch(getApiBase() + 'auth', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -432,7 +446,7 @@ class SGCFiles {
                 headers['X-API-Key'] = this.apiToken;
             }
             
-            const response = await fetch('/api/files/create', {
+            const response = await fetch(getApiBase() + 'files/create', {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify({
@@ -475,7 +489,7 @@ class SGCFiles {
                 headers['X-API-Key'] = this.apiToken;
             }
             
-            const response = await fetch('/api/files/create', {
+            const response = await fetch(getApiBase() + 'files/create', {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify({
@@ -494,7 +508,7 @@ class SGCFiles {
                 deleteHeaders['X-API-Key'] = this.apiToken;
             }
             
-            await fetch('/api/files/delete', {
+            await fetch(getApiBase() + 'files/delete', {
                 method: 'DELETE',
                 headers: deleteHeaders,
                 body: JSON.stringify({

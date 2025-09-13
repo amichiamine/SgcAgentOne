@@ -38,10 +38,6 @@ externalPort = 3000
 localPort = 39773
 externalPort = 3001
 
-[[ports]]
-localPort = 42521
-externalPort = 3002
-
 [nix]
 channel = "stable-25_05"
 packages = ["sqlite"]

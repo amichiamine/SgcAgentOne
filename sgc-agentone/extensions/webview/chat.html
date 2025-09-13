@@ -291,6 +291,20 @@
     </div>
 
     <script>
+        // Fonction de détection automatique du chemin de base de l'API
+        function getApiBase() {
+            const currentPath = window.location.pathname;
+            // Détection si nous sommes dans un sous-dossier (XAMPP/hébergement)
+            if (currentPath.includes('/sgc-agentone/') || 
+                (currentPath.includes('/extensions/') && !currentPath.startsWith('/extensions/'))) {
+                // Déploiement XAMPP/hébergement - extraire le chemin de base
+                const basePath = currentPath.split('/extensions/')[0];
+                return basePath + '/api/';
+            }
+            // Replit ou racine
+            return '/api/';
+        }
+        
         // Variables globales
         let messagesContainer, messageInput, sendButton;
         
@@ -313,7 +327,7 @@
         async function getAuthToken() {
             if (!authToken) {
                 try {
-                    const response = await fetch('/api/auth/token', {
+                    const response = await fetch(getApiBase() + 'auth/token', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -365,7 +379,7 @@
                     headers['X-API-Key'] = token;
                 }
                 
-                const response = await fetch('/api/chat', {
+                const response = await fetch(getApiBase() + 'chat', {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify({
@@ -1178,7 +1192,7 @@
             const token = await getAuthToken();
             
             try {
-                const response = await fetch('/api/chat', {
+                const response = await fetch(getApiBase() + 'chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1806,7 +1820,7 @@
             // Fonctions internes
             async function loadPatterns() {
                 try {
-                    const response = await fetch('/api/prompts', {
+                    const response = await fetch(getApiBase() + 'prompts', {
                         headers: {
                             'X-API-Key': await getAuthToken() || 'development'
                         }
@@ -1911,7 +1925,7 @@
                 }
                 
                 try {
-                    const response = await fetch('/api/prompts', {
+                    const response = await fetch(getApiBase() + 'prompts', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -2065,7 +2079,7 @@
             
             async function resetPatterns() {
                 try {
-                    const response = await fetch('/api/prompts/reset', {
+                    const response = await fetch(getApiBase() + 'prompts/reset', {
                         method: 'POST',
                         headers: {
                             'X-API-Key': await getAuthToken() || 'development'
@@ -2252,7 +2266,7 @@
             
             async function loadServerData() {
                 try {
-                    const response = await fetch('/api/server/status', {
+                    const response = await fetch(getApiBase() + 'server/status', {
                         headers: {
                             'X-API-Key': await getAuthToken() || 'development'
                         }
@@ -2366,7 +2380,7 @@
             
             async function updateLiveLogs() {
                 try {
-                    const response = await fetch('/api/server/logs', {
+                    const response = await fetch(getApiBase() + 'server/logs', {
                         headers: {
                             'X-API-Key': await getAuthToken() || 'development'
                         }
@@ -2538,7 +2552,7 @@
                 };
                 
                 try {
-                    const response = await fetch('/api/server/config', {
+                    const response = await fetch(getApiBase() + 'server/config', {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -2789,7 +2803,7 @@
         
         async function openFileDialog() {
             try {
-                const response = await fetch('/api/files/list', {
+                const response = await fetch(getApiBase() + 'files/list', {
                     headers: {
                         'X-API-Key': await getAuthToken() || 'development'
                     }
@@ -2845,7 +2859,7 @@
                     return;
                 }
                 
-                const response = await fetch('/api/files/read', {
+                const response = await fetch(getApiBase() + 'files/read', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2917,7 +2931,7 @@
             const content = monacoEditor.getValue();
             
             try {
-                const response = await fetch('/api/files/save', {
+                const response = await fetch(getApiBase() + 'files/save', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -3194,7 +3208,7 @@
             if (!fileTree) return;
             
             try {
-                const response = await fetch('/api/files/tree', {
+                const response = await fetch(getApiBase() + 'files/tree', {
                     headers: {
                         'X-API-Key': await getAuthToken() || 'development'
                     }
