@@ -3125,8 +3125,10 @@
                 console.log('📁 Navigation vers dossier:', filePath, '→', relativePath);
                 changeProjectFolder(relativePath);
             } else {
-                // Si c'est un fichier, l'ouvrir
-                openFile(filePath);
+                // Si c'est un fichier, construire le chemin relatif et l'ouvrir
+                const relativeFilePath = buildRelativeFilePath(filePath);
+                console.log('📄 Ouverture fichier:', filePath, '→', relativeFilePath);
+                openFile(relativeFilePath);
             }
         }
         
@@ -3143,6 +3145,21 @@
             
             // Sinon, construire le chemin relatif
             return `${currentWorkingDirectory}/${folderName}`;
+        }
+        
+        // Construire un chemin relatif pour un fichier depuis le dossier de travail actuel
+        function buildRelativeFilePath(fullPath) {
+            // Extraire juste le nom du fichier depuis le chemin complet retourné par l'API
+            const pathParts = fullPath.split('/');
+            const fileName = pathParts[pathParts.length - 1];
+            
+            // Si on est à la racine, utiliser juste le nom du fichier
+            if (currentWorkingDirectory === '.') {
+                return fileName;
+            }
+            
+            // Sinon, construire le chemin relatif complet
+            return `${currentWorkingDirectory}/${fileName}`;
         }
         
         // Version obsolète pour compatibilité (utilisée plus bas)
