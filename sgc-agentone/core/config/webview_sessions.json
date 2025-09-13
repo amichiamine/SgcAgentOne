@@ -22,5 +22,21 @@
             "chat",
             "file_operations"
         ]
+    },
+    "webview_05f6f9673d22c5fa88d24aac674fa9bb_1757740022": {
+        "created": 1757740022,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
+    },
+    "webview_1b519a49745b9440451423fc06316e49_1757740063": {
+        "created": 1757740063,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
     }
 }
