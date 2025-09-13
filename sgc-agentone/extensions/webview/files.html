@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGC-AgentOne - Files</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="theme/colors.css">
+    <link rel="stylesheet" href="theme/fonts.css">
+    <link rel="stylesheet" href="theme/syntax.css">
+    <link rel="stylesheet" href="files.css">
+</head>
+<body>
+    <div class="sgc-container">
+        <!-- Navigation -->
+        <nav class="sgc-nav">
+            <div class="sgc-nav-brand">
+                <div class="sgc-logo">
+                    <i class="fas fa-robot"></i>
+                    <span>SGC-AgentOne</span>
+                </div>
+            </div>
+            <div class="sgc-nav-links" id="nav-links">
+                <!-- Navigation links will be populated by JavaScript -->
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="sgc-main">
+            <div class="sgc-header">
+                <h1 class="sgc-title">
+                    <i class="fas fa-folder"></i>
+                    Files
+                </h1>
+                <p class="sgc-subtitle">Gestionnaire de fichiers et explorateur de projets</p>
+            </div>
+
+            <!-- File Controls -->
+            <div class="file-controls">
+                <div class="path-navigation">
+                    <button id="parent-btn" class="nav-btn" title="Dossier parent" disabled>
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                    <button id="refresh-btn" class="nav-btn" title="Actualiser">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button id="home-btn" class="nav-btn" title="Racine projet">
+                        <i class="fas fa-home"></i>
+                    </button>
+                </div>
+
+                <div class="path-bar">
+                    <div class="path-input-container">
+                        <i class="fas fa-folder-open path-icon" id="path-icon"></i>
+                        <input type="text" id="path-input" placeholder="Chemin du dossier..." autocomplete="off">
+                        <button id="change-folder-btn" class="change-btn">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Changer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="file-actions">
+                    <button id="new-file-btn" class="action-btn" title="Nouveau fichier">
+                        <i class="fas fa-file-plus"></i>
+                        <span>Nouveau</span>
+                    </button>
+                    <button id="new-folder-btn" class="action-btn" title="Nouveau dossier">
+                        <i class="fas fa-folder-plus"></i>
+                    </button>
+                    <button id="view-tree-btn" class="action-btn active" title="Vue arbre">
+                        <i class="fas fa-sitemap"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- File Content -->
+            <div class="file-content" id="file-content">
+                <!-- Current Path Display -->
+                <div class="current-path">
+                    <span class="path-label">Dossier actuel :</span>
+                    <span class="path-display" id="current-path-display">.</span>
+                    <span class="files-count" id="files-count">0 éléments</span>
+                </div>
+
+                <!-- File Explorer -->
+                <div class="file-explorer">
+                    <div class="explorer-loading" id="loading-indicator">
+                        <div class="loading-spinner"></div>
+                        <span>Chargement des fichiers...</span>
+                    </div>
+
+                    <div class="file-tree" id="file-tree">
+                        <!-- File tree will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Error Display -->
+                    <div class="explorer-error" id="error-display" style="display: none;">
+                        <i class="fas fa-exclamation-triangle error-icon"></i>
+                        <h3>Erreur d'accès</h3>
+                        <p id="error-message">Impossible d'accéder au dossier demandé.</p>
+                        <div class="error-actions">
+                            <button id="retry-btn" class="sgc-btn sgc-btn-primary">
+                                <i class="fas fa-redo"></i>
+                                Réessayer
+                            </button>
+                            <button id="home-error-btn" class="sgc-btn sgc-btn-secondary">
+                                <i class="fas fa-home"></i>
+                                Retour racine
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="file-status">
+                <div class="status-left">
+                    <span id="status-text">Prêt</span>
+                </div>
+                <div class="status-right">
+                    <span id="selection-count">Aucune sélection</span>
+                    <span id="total-size">0 octets</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- New File Modal -->
+    <div class="modal" id="new-file-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-plus"></i> Nouveau fichier</h3>
+                <button class="close-modal" data-modal="new-file-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="new-file-name">Nom du fichier :</label>
+                    <input type="text" id="new-file-name" placeholder="exemple.txt" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="new-file-content">Contenu initial (optionnel) :</label>
+                    <textarea id="new-file-content" placeholder="Contenu du fichier..." rows="5"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button id="create-file-btn" class="sgc-btn sgc-btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Créer
+                    </button>
+                    <button class="close-modal sgc-btn sgc-btn-secondary" data-modal="new-file-modal">
+                        Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Folder Modal -->
+    <div class="modal" id="new-folder-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-folder-plus"></i> Nouveau dossier</h3>
+                <button class="close-modal" data-modal="new-folder-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="new-folder-name">Nom du dossier :</label>
+                    <input type="text" id="new-folder-name" placeholder="mon-dossier" autocomplete="off">
+                </div>
+                <div class="modal-actions">
+                    <button id="create-folder-btn" class="sgc-btn sgc-btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Créer
+                    </button>
+                    <button class="close-modal sgc-btn sgc-btn-secondary" data-modal="new-folder-modal">
+                        Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="navigation.js"></script>
+    <script src="files.js"></script>
+    
+    <!-- Initialize navigation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate navigation links
+            const navLinks = document.getElementById('nav-links');
+            if (navLinks && window.SGCNavigation) {
+                const views = window.SGCNavigation.getAvailableViews();
+                navLinks.innerHTML = Object.keys(views).map(viewId => `
+                    <a href="#" class="nav-link" data-view="${viewId}">
+                        <i class="${views[viewId].icon}"></i>
+                        <span>${views[viewId].name}</span>
+                    </a>
+                `).join('');
+                
+                // Add click handlers for navigation
+                navLinks.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const viewId = link.dataset.view;
+                        // Send message to parent to change view
+                        if (window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'navigate',
+                                view: viewId
+                            }, window.location.origin);
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
