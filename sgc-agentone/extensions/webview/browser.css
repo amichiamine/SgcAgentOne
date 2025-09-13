@@ -1,5 +1,26 @@
 /* SGC-AgentOne Browser Styles */
 
+/* Base Styles for Container Layout */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.sgc-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--sgc-bg-primary);
+}
+
+.sgc-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1rem;
+}
+
 /* Browser Controls */
 .browser-controls {
     display: flex;
