@@ -220,7 +220,10 @@ function executeAction($interpretation, $projectPath) {
         'update file' => 'updateFile.php',
         'read file' => 'readFile.php',
         'create database' => 'createDB.php',
-        'execute query' => 'executeQuery.php'
+        'execute query' => 'executeQuery.php',
+        'show help menu' => 'showHelpMenu.php',
+        'show chat help' => 'showChatHelp.php',
+        'show ide help' => 'showIdeHelp.php'
     ];
     
     if (!isset($actionFiles[$action])) {

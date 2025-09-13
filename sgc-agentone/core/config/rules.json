@@ -68,22 +68,6 @@
         "action": "update file"
     },
     {
-        "pattern": "help",
-        "action": "show help menu"
-    },
-    {
-        "pattern": "aide",
-        "action": "show help menu"
-    },
-    {
-        "pattern": "help me",
-        "action": "show help menu"
-    },
-    {
-        "pattern": "besoin d'aide",
-        "action": "show help menu"
-    },
-    {
         "pattern": "help chat",
         "action": "show chat help"
     },
@@ -98,5 +82,21 @@
     {
         "pattern": "aide ide",
         "action": "show ide help"
+    },
+    {
+        "pattern": "help me",
+        "action": "show help menu"
+    },
+    {
+        "pattern": "besoin d'aide",
+        "action": "show help menu"
+    },
+    {
+        "pattern": "help",
+        "action": "show help menu"
+    },
+    {
+        "pattern": "aide",
+        "action": "show help menu"
     }
 ]

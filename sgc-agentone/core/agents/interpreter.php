@@ -52,10 +52,36 @@ function matchesPattern($message, $pattern) {
         return preg_match($regex, $message);
     }
     
-    // Recherche de mots-clés
-    $keywords = explode(' ', $pattern);
-    $matchCount = 0;
+    // Correspondance exacte d'abord (priorité)
+    if (trim($message) === trim($pattern)) {
+        return true;
+    }
     
+    // Recherche de mots-clés (pour les patterns plus complexes)
+    $keywords = explode(' ', $pattern);
+    $messageWords = explode(' ', $message);
+    
+    // Pour les patterns help, exiger une correspondance plus stricte
+    if (strpos($pattern, 'help') === 0 || strpos($pattern, 'aide') === 0) {
+        // Pour les patterns help spécifiques (ex: "help chat", "help ide")
+        if (count($keywords) > 1) {
+            // Tous les mots du pattern doivent être présents dans l'ordre
+            $patternIndex = 0;
+            foreach ($messageWords as $word) {
+                if ($patternIndex < count($keywords) && $word === $keywords[$patternIndex]) {
+                    $patternIndex++;
+                }
+            }
+            return $patternIndex === count($keywords);
+        }
+        // Pour les patterns help simples (ex: "help", "aide")
+        else {
+            return in_array(trim($pattern), $messageWords);
+        }
+    }
+    
+    // Logique normale pour les autres patterns
+    $matchCount = 0;
     foreach ($keywords as $keyword) {
         if (strpos($message, trim($keyword)) !== false) {
             $matchCount++;
