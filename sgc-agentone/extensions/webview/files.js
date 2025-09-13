@@ -38,7 +38,7 @@ function getProjectInfo() {
         name: projectName || 'sgc-agentone', // fallback par défaut
         isReplit: isReplit,
         basePath: projectName ? `/${projectName}` : '',
-        themePath: projectName ? `/${projectName}/theme` : '/theme',
+        themePath: projectName ? `/${projectName}/extensions/webview/theme` : '/extensions/webview/theme',
         apiPath: projectName ? `/${projectName}/api` : '/api'
     };
 }
@@ -204,7 +204,7 @@ class SGCFiles {
                 headers['X-API-Key'] = this.apiToken;
             }
             
-            const response = await fetch(`/api/files/list?dir=${encodeURIComponent(this.currentPath)}`, {
+            const response = await fetch(`${getApiBase()}files/list?dir=${encodeURIComponent(this.currentPath)}`, {
                 headers: headers
             });
             

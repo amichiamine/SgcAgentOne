@@ -57,7 +57,7 @@
                 name: projectName || 'sgc-agentone', // fallback par défaut
                 isReplit: isReplit,
                 basePath: projectName ? `/${projectName}` : '',
-                themePath: projectName ? `/${projectName}/theme` : '/theme',
+                themePath: projectName ? `/${projectName}/extensions/webview/theme` : '/extensions/webview/theme',
                 apiPath: projectName ? `/${projectName}/api` : '/api'
             };
         }
@@ -1220,7 +1220,7 @@
             if (currentAuthToken) return currentAuthToken;
             
             try {
-                const response = await fetch('/api/auth/token', {
+                const response = await fetch(getApiBase() + 'auth/token', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1319,7 +1319,7 @@
                 console.log('🔄 Changement de dossier:', newPath, '→', cleanPath);
                 
                 // Test si le dossier existe via l'API files
-                const response = await fetch(`/api/files/list?dir=${encodeURIComponent(cleanPath)}`, {
+                const response = await fetch(`${getApiBase()}files/list?dir=${encodeURIComponent(cleanPath)}`, {
                     headers: {
                         'X-API-Key': await getAuthToken() || 'development'
                     }

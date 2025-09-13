@@ -38,7 +38,7 @@ function getProjectInfo() {
         name: projectName || 'sgc-agentone', // fallback par défaut
         isReplit: isReplit,
         basePath: projectName ? `/${projectName}` : '',
-        themePath: projectName ? `/${projectName}/theme` : '/theme',
+        themePath: projectName ? `/${projectName}/extensions/webview/theme` : '/extensions/webview/theme',
         apiPath: projectName ? `/${projectName}/api` : '/api'
     };
 }
