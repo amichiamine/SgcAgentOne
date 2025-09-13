@@ -3167,7 +3167,7 @@
             if (!fileTree) return;
             
             try {
-                const response = await fetch(`/api/files/list?dir=${encodeURIComponent(directory)}`, {
+                const response = await fetch(`${getApiBase()}files/list?dir=${encodeURIComponent(directory)}`, {
                     headers: {
                         'X-API-Key': await getAuthToken() || 'development'
                     }
