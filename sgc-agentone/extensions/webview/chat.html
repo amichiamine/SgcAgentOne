@@ -2836,6 +2836,15 @@
         
         async function openFile(filepath) {
             try {
+                console.log('🔄 Début openFile:', filepath);
+                
+                // Vérifier que Monaco Editor est initialisé
+                if (!monacoEditor) {
+                    console.error('Monaco Editor pas encore initialisé');
+                    showAPIMessage('Éditeur pas encore prêt. Veuillez passer à l\'onglet Editor d\'abord.', 'warning');
+                    return;
+                }
+                
                 const response = await fetch('/api/files/read', {
                     method: 'POST',
                     headers: {
@@ -2845,9 +2854,14 @@
                     body: JSON.stringify({ filepath: filepath })
                 });
                 
+                console.log('📡 Réponse API:', response.status);
+                
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('📄 Données reçues:', data.filepath, `(${data.content.length} caractères)`);
+                    
                     const language = detectLanguageFromFilename(filepath);
+                    console.log('🔤 Langage détecté:', language);
                     
                     // Créer ou réutiliser un onglet
                     const existingTabIndex = editorTabs.findIndex(tab => tab.filename === filepath);
@@ -2855,6 +2869,7 @@
                     if (existingTabIndex >= 0) {
                         // Onglet existe déjà, l'activer
                         activeTabIndex = existingTabIndex;
+                        console.log('📂 Onglet existant activé:', activeTabIndex);
                     } else {
                         // Créer un nouvel onglet
                         editorTabs.push({
@@ -2864,22 +2879,33 @@
                             modified: false
                         });
                         activeTabIndex = editorTabs.length - 1;
+                        console.log('📂 Nouvel onglet créé:', activeTabIndex);
                     }
                     
-                    // Mettre à jour l'éditeur
-                    monaco.editor.setModelLanguage(monacoEditor.getModel(), language);
-                    monacoEditor.setValue(data.content);
+                    // Mettre à jour l'éditeur seulement si Monaco est prêt
+                    try {
+                        console.log('⚙️ Mise à jour Monaco Editor...');
+                        monaco.editor.setModelLanguage(monacoEditor.getModel(), language);
+                        monacoEditor.setValue(data.content);
+                        console.log('✅ Monaco Editor mis à jour');
+                    } catch (editorError) {
+                        console.error('❌ Erreur Monaco Editor:', editorError);
+                        showAPIMessage('Erreur lors de la mise à jour de l\'éditeur', 'error');
+                        return;
+                    }
                     
                     // Mettre à jour l'interface
                     updateTabsDisplay();
                     updateLanguageSelect(language);
                     
                     showAPIMessage(`Fichier ouvert: ${filepath}`, 'success');
+                    console.log('🎉 Fichier ouvert avec succès');
                 } else {
+                    console.error('❌ Erreur réponse API:', response.status);
                     showAPIMessage('Erreur lors de l\'ouverture du fichier', 'error');
                 }
             } catch (error) {
-                console.error('Erreur ouverture fichier:', error);
+                console.error('❌ Erreur ouverture fichier:', error);
                 showAPIMessage('Erreur de connexion', 'error');
             }
         }
