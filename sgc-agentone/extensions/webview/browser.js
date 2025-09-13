@@ -3,6 +3,20 @@
  * Fonctionnalités: Navigation web, preview de projet, marque-pages
  */
 
+// Fonction de détection automatique du chemin de base de l'API
+function getApiBase() {
+    const currentPath = window.location.pathname;
+    // Détection si nous sommes dans un sous-dossier (XAMPP/hébergement)
+    if (currentPath.includes('/sgc-agentone/') || 
+        (currentPath.includes('/extensions/') && !currentPath.startsWith('/extensions/'))) {
+        // Déploiement XAMPP/hébergement - extraire le chemin de base
+        const basePath = currentPath.split('/extensions/')[0];
+        return basePath + '/api/';
+    }
+    // Replit ou racine
+    return '/api/';
+}
+
 class SGCBrowser {
     constructor() {
         this.currentUrl = '';
@@ -24,7 +38,7 @@ class SGCBrowser {
 
     async initializeAuth() {
         try {
-            const response = await fetch('/api/auth', {
+            const response = await fetch(getApiBase() + 'auth', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -446,7 +460,7 @@ class SGCBrowser {
             }
             
             // Get HTML files from the files API
-            const response = await fetch('/api/files/list', {
+            const response = await fetch(getApiBase() + 'files/list', {
                 headers: headers
             });
             
