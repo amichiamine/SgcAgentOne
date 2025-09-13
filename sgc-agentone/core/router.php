@@ -19,7 +19,7 @@ if (file_exists($settingsFile)) {
 // Configuration CORS sécurisée
 $allowedOrigins = $settings['security']['allowed_origins'] ?? ['http://localhost:5000'];
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-$allowedOrigin = '*'; // fallback pour développement local
+$allowedOrigin = null; // Pas de fallback wildcard
 
 foreach ($allowedOrigins as $allowed) {
     if (fnmatch($allowed, $origin)) {
@@ -28,7 +28,21 @@ foreach ($allowedOrigins as $allowed) {
     }
 }
 
-header("Access-Control-Allow-Origin: {$allowedOrigin}");
+// Fallback sécurisé pour développement local explicite uniquement
+if (!$allowedOrigin) {
+    $parsedOrigin = parse_url($origin);
+    $host = $parsedOrigin['host'] ?? '';
+    $allowedLocalHosts = ['localhost', '127.0.0.1'];
+    
+    if (in_array($host, $allowedLocalHosts)) {
+        $allowedOrigin = $origin;
+    }
+}
+
+// Appliquer CORS seulement si origine autorisée
+if ($allowedOrigin) {
+    header("Access-Control-Allow-Origin: {$allowedOrigin}");
+}
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS, HEAD');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key');
 header('Cache-Control: no-cache');
@@ -63,19 +77,7 @@ if (strpos($requestUri, '/api/auth') === 0 || $requestUri === '/api/auth' || $re
     }
 }
 
-if (strpos($requestUri, '/api/prompts') === 0 || $requestUri === '/api/prompts') {
-    // Inclusion de l'API prompts
-    $promptsApiFile = $projectRoot . '/sgc-agentone/core/api/prompts.php';
-    if (file_exists($promptsApiFile)) {
-        include $promptsApiFile;
-        exit();
-    } else {
-        http_response_code(500);
-        header('Content-Type: application/json');
-        echo json_encode(['error' => 'API prompts non disponible']);
-        exit();
-    }
-}
+
 
 if (strpos($requestUri, '/api/chat') === 0 || $requestUri === '/api/chat') {
     // Inclusion de l'API chat
@@ -119,19 +121,7 @@ if (strpos($requestUri, '/api/files') === 0 || $requestUri === '/api/files') {
     }
 }
 
-if (strpos($requestUri, '/api/prompts') === 0 || $requestUri === '/api/prompts') {
-    // Inclusion de l'API prompts
-    $promptsApiFile = $projectRoot . '/sgc-agentone/core/api/prompts.php';
-    if (file_exists($promptsApiFile)) {
-        include $promptsApiFile;
-        exit();
-    } else {
-        http_response_code(500);
-        header('Content-Type: application/json');
-        echo json_encode(['error' => 'API prompts non disponible']);
-        exit();
-    }
-}
+
 
 // Log simple des requêtes pour les autres routes (dans error_log, jamais echo avant headers)
 $timestamp = date('[H:i:s]');
@@ -186,20 +176,55 @@ $staticFile = $projectRoot . '/sgc-agentone' . $requestUri;
 $realPath = realpath($staticFile);
 if ($realPath === false || strpos($realPath, $projectRoot) !== 0) {
     http_response_code(403);
-    echo "Accès interdit";
+    // Détecter si c'est une requête API pour renvoyer du JSON
+    if (strpos($requestUri, '/api/') === 0) {
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Accès interdit']);
+    } else {
+        echo "Accès interdit";
+    }
     exit();
 }
 
-// Servir le fichier statique si il existe
+// SÉCURITÉ RENFORCÉE - Vérifier le chemin réel résolu pour éviter les contournements
+$coreDir = $projectRoot . '/sgc-agentone/core';
+if ($realPath && strpos($realPath, $coreDir) === 0) {
+    http_response_code(403);
+    if (strpos($requestUri, '/api/') === 0) {
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Accès interdit au répertoire core']);
+    } else {
+        echo "Accès interdit au répertoire core";
+    }
+    exit();
+}
+
+// SÉCURITÉ - Bloquer les fichiers PHP et JSON basé sur le chemin réel
+if ($realPath && file_exists($realPath)) {
+    $extension = pathinfo($realPath, PATHINFO_EXTENSION);
+    $isSgcFile = strpos($realPath, $projectRoot . '/sgc-agentone') === 0;
+    
+    if (in_array($extension, ['php', 'json']) && $isSgcFile) {
+        http_response_code(403);
+        if (strpos($requestUri, '/api/') === 0) {
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Type de fichier non autorisé']);
+        } else {
+            echo "Type de fichier non autorisé";
+        }
+        exit();
+    }
+}
+
+// Servir le fichier statique si il existe ET est sécurisé
 if (file_exists($staticFile) && is_file($staticFile)) {
     $extension = pathinfo($staticFile, PATHINFO_EXTENSION);
     
-    // Types MIME supportés
+    // Types MIME supportés - SANS JSON et PHP pour sécurité
     $mimeTypes = [
         'html' => 'text/html; charset=utf-8',
         'css' => 'text/css',
         'js' => 'application/javascript',
-        'json' => 'application/json',
         'png' => 'image/png',
         'jpg' => 'image/jpeg',
         'jpeg' => 'image/jpeg',
@@ -225,6 +250,12 @@ if (file_exists($staticFile) && is_file($staticFile)) {
 
 // 404 - Ressource non trouvée
 http_response_code(404);
-header('Content-Type: text/plain');
-echo "404 - Page non trouvée: {$requestUri}";
+// Détecter si c'est une requête API pour renvoyer du JSON
+if (strpos($requestUri, '/api/') === 0) {
+    header('Content-Type: application/json');
+    echo json_encode(['error' => '404 - API endpoint non trouvé', 'path' => $requestUri]);
+} else {
+    header('Content-Type: text/plain');
+    echo "404 - Page non trouvée: {$requestUri}";
+}
 ?>

@@ -4,7 +4,18 @@
   "project_root": ".",
   "security": {
     "api_key": "sgc-agent-dev-key-2024",
-    "allowed_origins": ["http://localhost:5000", "https://*.replit.dev"],
+    "allowed_origins": [
+      "http://localhost:5000", 
+      "https://*.replit.dev",
+      "http://localhost",
+      "http://localhost:80",
+      "http://localhost:8080",
+      "http://127.0.0.1",
+      "http://127.0.0.1:80",
+      "http://127.0.0.1:8080",
+      "https://localhost",
+      "https://127.0.0.1"
+    ],
     "require_auth": true
   }
 }

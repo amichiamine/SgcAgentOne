@@ -1,0 +1,71 @@
+RewriteEngine On
+
+# Redirection vers HTTPS (optionnel pour production)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# SÉCURITÉ - Bloquer l'accès à tout le répertoire sgc-agentone/core/ (AVANT toute autre règle)
+RewriteRule ^sgc-agentone/core/ - [F]
+
+# SÉCURITÉ - Bloquer tous les fichiers PHP dans sgc-agentone/
+RewriteRule ^sgc-agentone/.*\.php$ - [F]
+
+# SÉCURITÉ - Bloquer tous les fichiers JSON (configurations sensibles)
+RewriteRule ^sgc-agentone/.*\.json$ - [F]
+
+# Permettre l'accès aux fichiers statiques (SANS JSON)
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^(.*\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf))$ - [L]
+
+# Permettre seulement les fichiers statiques dans sgc-agentone/
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^sgc-agentone/(.*\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|html))$ - [L]
+
+# Rediriger les requêtes API vers le router SGC-AgentOne
+RewriteRule ^api/(.*)$ sgc-agentone/core/router.php [L,QSA]
+
+# Rediriger les requêtes d'extensions vers les fichiers SGC-AgentOne
+RewriteRule ^extensions/(.*)$ sgc-agentone/extensions/$1 [L,QSA]
+
+# Rediriger les autres requêtes non-fichiers vers le router SGC-AgentOne
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/sgc-agentone/
+RewriteRule ^(.*)$ sgc-agentone/core/router.php [L,QSA]
+
+# Index par défaut
+DirectoryIndex index.php index.html
+
+# Configuration de sécurité
+<Files "*.json">
+    <RequireAll>
+        Require local
+        Require ip 127.0.0.1
+        Require ip ::1
+    </RequireAll>
+</Files>
+
+# Blocage des fichiers sensibles
+<FilesMatch "\.(log|db|backup)$">
+    Require all denied
+</FilesMatch>
+
+# Headers de sécurité
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Compression (optionnel)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
