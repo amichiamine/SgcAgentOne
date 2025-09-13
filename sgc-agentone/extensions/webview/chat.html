@@ -1087,11 +1087,13 @@
                     
                 case 'browser':
                     chatContainer.innerHTML = `
-                        <iframe 
-                            src="/extensions/webview/browser.html" 
-                            style="width: 100%; height: 100%; border: none; border-radius: 8px;" 
-                            title="Navigateur web intégré">
-                        </iframe>
+                        <div class="tab-content clay-panel" style="flex: 1; padding: 0; margin: 1rem; overflow: hidden; min-height: 70vh;">
+                            <iframe 
+                                src="/extensions/webview/browser.html" 
+                                style="width: 100%; height: 100%; border: none; border-radius: 8px;" 
+                                title="Navigateur web intégré">
+                            </iframe>
+                        </div>
                     `;
                     break;
             }
