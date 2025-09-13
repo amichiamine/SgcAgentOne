@@ -70,5 +70,37 @@
             "chat",
             "file_operations"
         ]
+    },
+    "webview_626485212642ee0d54afd76f33fa0a9f_1757741320": {
+        "created": 1757741320,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
+    },
+    "webview_5df05e3a5fcf000767eb0158ff470247_1757741322": {
+        "created": 1757741322,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
+    },
+    "webview_617a850a0853915aa081c1d844328c03_1757741337": {
+        "created": 1757741337,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
+    },
+    "webview_7b174c1afb89c4e3e65233bb080cf3e5_1757741339": {
+        "created": 1757741339,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
     }
 }

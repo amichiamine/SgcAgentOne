@@ -1214,12 +1214,44 @@
             return await sendAPIMessage(message);
         }
         
+        // Fonction pour normaliser les chemins relatifs
+        function normalizeRelativePath(path) {
+            // Nettoyer le chemin
+            let cleanPath = path.trim();
+            if (cleanPath === '' || cleanPath === '/') return '.';
+            
+            // Supprimer les slashes de début et fin
+            cleanPath = cleanPath.replace(/^\/+|\/+$/g, '');
+            if (cleanPath === '') return '.';
+            
+            // Diviser en segments
+            const segments = cleanPath.split('/').filter(segment => segment !== '' && segment !== '.');
+            const normalizedSegments = [];
+            
+            // Traiter chaque segment
+            for (const segment of segments) {
+                if (segment === '..') {
+                    // Remonter d'un niveau seulement si possible
+                    if (normalizedSegments.length > 0) {
+                        normalizedSegments.pop();
+                    }
+                    // Si on ne peut pas remonter plus, ignorer le '..'
+                } else {
+                    normalizedSegments.push(segment);
+                }
+            }
+            
+            // Construire le chemin final relatif
+            return normalizedSegments.length > 0 ? normalizedSegments.join('/') : '.';
+        }
+
         // Fonction pour changer le dossier de projet
         async function changeProjectFolder(newPath) {
             try {
-                // Nettoyer et normaliser le chemin
-                let cleanPath = newPath.trim();
-                if (cleanPath === '') cleanPath = '.';
+                // Normaliser le chemin pour qu'il reste relatif
+                let cleanPath = normalizeRelativePath(newPath);
+                
+                console.log('🔄 Changement de dossier:', newPath, '→', cleanPath);
                 
                 // Test si le dossier existe via l'API files
                 const response = await fetch(`/api/files/list?dir=${encodeURIComponent(cleanPath)}`, {
@@ -1404,8 +1436,21 @@
             
             if (parentFolderBtn) {
                 parentFolderBtn.addEventListener('click', async () => {
-                    const currentPath = folderPathInput.value || '.';
-                    const parentPath = currentPath === '.' ? '..' : `${currentPath}/..`;
+                    const currentPath = currentWorkingDirectory || '.';
+                    console.log('🔼 Navigation parent depuis:', currentPath);
+                    
+                    // Calculer le dossier parent de manière relative
+                    if (currentPath === '.') {
+                        // Déjà à la racine, ne rien faire
+                        showAPIMessage('⚠️ Déjà à la racine du projet', 'warning');
+                        return;
+                    }
+                    
+                    // Remonter d'un niveau
+                    const pathSegments = currentPath.split('/').filter(s => s !== '' && s !== '.');
+                    pathSegments.pop(); // Enlever le dernier segment
+                    const parentPath = pathSegments.length > 0 ? pathSegments.join('/') : '.';
+                    
                     await changeProjectFolder(parentPath);
                 });
             }
@@ -3075,12 +3120,29 @@
         // Gestionnaire de clic sur fichier/dossier
         function handleFileClick(filePath, fileType) {
             if (fileType === 'directory') {
-                // Si c'est un dossier, y naviguer
-                changeProjectFolder(filePath);
+                // Construire le chemin relatif pour navigation
+                const relativePath = buildRelativePath(filePath);
+                console.log('📁 Navigation vers dossier:', filePath, '→', relativePath);
+                changeProjectFolder(relativePath);
             } else {
                 // Si c'est un fichier, l'ouvrir
                 openFile(filePath);
             }
+        }
+        
+        // Construire un chemin relatif depuis le dossier de travail actuel
+        function buildRelativePath(fullPath) {
+            // Extraire juste le nom du dossier depuis le chemin complet retourné par l'API
+            const pathParts = fullPath.split('/');
+            const folderName = pathParts[pathParts.length - 1];
+            
+            // Si on est à la racine, utiliser juste le nom du dossier
+            if (currentWorkingDirectory === '.') {
+                return folderName;
+            }
+            
+            // Sinon, construire le chemin relatif
+            return `${currentWorkingDirectory}/${folderName}`;
         }
         
         // Version obsolète pour compatibilité (utilisée plus bas)
