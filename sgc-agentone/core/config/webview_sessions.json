@@ -102,5 +102,13 @@
             "chat",
             "file_operations"
         ]
+    },
+    "webview_3ee69e739979e09b5a7181ebe1ccbdc9_1757741389": {
+        "created": 1757741389,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
     }
 }
