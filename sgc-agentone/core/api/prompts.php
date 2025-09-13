@@ -188,7 +188,7 @@ function validatePattern($pattern, $action) {
         return ['valid' => false, 'error' => 'Action trop longue (max 50 caractères)'];
     }
     
-    $validActions = ['create file', 'update file', 'read file', 'delete file', 'create folder', 'delete folder', 'create database', 'execute query'];
+    $validActions = ['create file', 'update file', 'read file', 'delete file', 'create folder', 'delete folder', 'create structure', 'create database', 'execute query'];
     if (!in_array($action, $validActions)) {
         return ['valid' => false, 'error' => 'Action non valide: ' . implode(', ', $validActions)];
     }

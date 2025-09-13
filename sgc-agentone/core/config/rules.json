@@ -134,5 +134,37 @@
     {
         "pattern": "efface le dossier *",
         "action": "delete folder"
+    },
+    {
+        "pattern": "crée la structure *",
+        "action": "create structure"
+    },
+    {
+        "pattern": "create structure *",
+        "action": "create structure"
+    },
+    {
+        "pattern": "crée cette structure*",
+        "action": "create structure"
+    },
+    {
+        "pattern": "create this structure*",
+        "action": "create structure"
+    },
+    {
+        "pattern": "génère la structure *",
+        "action": "create structure"
+    },
+    {
+        "pattern": "initialise la structure *",
+        "action": "create structure"
+    },
+    {
+        "pattern": "initialize structure *",
+        "action": "create structure"
+    },
+    {
+        "pattern": "setup structure *",
+        "action": "create structure"
     }
 ]

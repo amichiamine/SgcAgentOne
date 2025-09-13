@@ -123,6 +123,10 @@ function extractParams($message, $pattern, $action) {
             $params = extractFolderParams($message, 'delete');
             break;
             
+        case 'create structure':
+            $params = extractStructureParams($message);
+            break;
+            
         case 'execute query':
             $params = extractQueryParams($message);
             break;
@@ -241,5 +245,40 @@ function getDefaultContent($extension) {
     ];
     
     return $templates[$extension] ?? '';
+}
+
+/**
+ * Extrait les paramètres pour la création de structure
+ */
+function extractStructureParams($message) {
+    $params = [];
+    
+    // Rechercher la structure après les mots-clés de déclenchement
+    $keywords = ['structure', 'cette structure', 'this structure'];
+    
+    $structure = '';
+    foreach ($keywords as $keyword) {
+        if (strpos($message, $keyword) !== false) {
+            // Extraire tout ce qui suit le mot-clé
+            $pos = strpos($message, $keyword) + strlen($keyword);
+            $structure = trim(substr($message, $pos));
+            
+            // Nettoyer les caractères de début (:, -, etc.)
+            $structure = preg_replace('/^[\s:_\-]+/', '', $structure);
+            break;
+        }
+    }
+    
+    // Si pas trouvé avec keywords, essayer de détecter le format arbre
+    if (empty($structure)) {
+        // Rechercher des lignes qui ressemblent à un arbre ou une liste
+        if (preg_match('/([├└│─\/\w\s\.,\n]+)/', $message, $matches)) {
+            $structure = $matches[1];
+        }
+    }
+    
+    $params['structure'] = $structure;
+    
+    return $params;
 }
 ?>

@@ -222,6 +222,7 @@ function executeAction($interpretation, $projectPath) {
         'delete file' => 'deleteFile.php',
         'create folder' => 'createFolder.php',
         'delete folder' => 'deleteFolder.php',
+        'create structure' => 'createStructure.php',
         'create database' => 'createDB.php',
         'execute query' => 'executeQuery.php',
         'show help menu' => 'showHelpMenu.php',
