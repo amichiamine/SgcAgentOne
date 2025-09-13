@@ -151,6 +151,34 @@ if ($requestUri === '/' || $requestUri === '/index.html') {
     }
 }
 
+// Route Files Explorer
+if ($requestUri === '/files' || $requestUri === '/files.html') {
+    $filesInterface = $projectRoot . '/sgc-agentone/extensions/webview/files.html';
+    if (file_exists($filesInterface)) {
+        header('Content-Type: text/html; charset=utf-8');
+        readfile($filesInterface);
+        exit();
+    } else {
+        http_response_code(404);
+        echo "Interface Files non disponible";
+        exit();
+    }
+}
+
+// Route Browser
+if ($requestUri === '/browser' || $requestUri === '/browser.html') {
+    $browserInterface = $projectRoot . '/sgc-agentone/extensions/webview/browser.html';
+    if (file_exists($browserInterface)) {
+        header('Content-Type: text/html; charset=utf-8');
+        readfile($browserInterface);
+        exit();
+    } else {
+        http_response_code(404);
+        echo "Interface Browser non disponible";
+        exit();
+    }
+}
+
 // Gestion des fichiers statiques
 $staticFile = $projectRoot . '/sgc-agentone' . $requestUri;
 
