@@ -110,5 +110,21 @@
             "chat",
             "file_operations"
         ]
+    },
+    "webview_74466150353075041237d93d7756f44e_1757741715": {
+        "created": 1757741715,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
+    },
+    "webview_e5e9c367da8dfe0009b5bd2fdaeef7ad_1757741765": {
+        "created": 1757741765,
+        "client_type": "webview",
+        "permissions": [
+            "chat",
+            "file_operations"
+        ]
     }
 }
