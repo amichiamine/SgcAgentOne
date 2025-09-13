@@ -1,10 +1,10 @@
 {
     "start_time": 1757722520,
-    "total_requests": 785,
+    "total_requests": 947,
     "routes": {
-        "\/api\/server\/status": 321,
-        "\/api\/server\/logs": 463,
+        "\/api\/server\/status": 386,
+        "\/api\/server\/logs": 560,
         "\/api\/server\/control": 1
     },
-    "last_updated": 1757734695
+    "last_updated": 1757734889
 }

@@ -1,0 +1,63 @@
+/* --- Palette HSL SGC-Commander --- */
+:root {
+  --background: hsl(222, 84%, 5%);
+  --foreground: hsl(210, 40%, 95%);
+  --card: hsl(215, 28%, 17%);
+  --primary: hsl(188, 95%, 42%);
+  --secondary: hsl(215, 16%, 25%);
+  --accent: hsl(188, 95%, 42%);
+  --border: hsl(217, 19%, 20%);
+  --muted-foreground: hsl(217, 10%, 58%);
+}
+
+/* --- Effets Claymorphism --- */
+.clay-panel {
+  background: linear-gradient(145deg, hsl(215, 28%, 19%), hsl(215, 28%, 15%));
+  box-shadow:
+    8px 8px 16px hsl(222, 84%, 2%),
+    -8px -8px 16px hsl(215, 28%, 24%),
+    inset 1px 1px 2px hsl(215, 28%, 25%);
+  border: 1px solid hsl(217, 19%, 20%);
+}
+
+.clay-button {
+  background: linear-gradient(145deg, hsl(215, 28%, 20%), hsl(215, 28%, 16%));
+  box-shadow:
+    4px 4px 8px hsl(222, 84%, 2%),
+    -4px -4px 8px hsl(215, 28%, 24%);
+  border: 1px solid hsl(217, 19%, 22%);
+  transition: all 0.2s ease;
+}
+
+.clay-button:hover {
+  background: linear-gradient(145deg, hsl(215, 28%, 22%), hsl(215, 28%, 18%));
+  box-shadow:
+    2px 2px 4px hsl(222, 84%, 2%),
+    -2px -2px 4px hsl(215, 28%, 26%);
+}
+
+.clay-button:active {
+  background: linear-gradient(145deg, hsl(215, 28%, 16%), hsl(215, 28%, 20%));
+  box-shadow:
+    inset 2px 2px 4px hsl(222, 84%, 2%),
+    inset -2px -2px 4px hsl(215, 28%, 26%);
+}
+
+.clay-button.active {
+  background: linear-gradient(145deg, hsl(188, 95%, 42%), hsl(188, 95%, 38%));
+  color: hsl(222, 84%, 5%);
+  box-shadow:
+    inset 2px 2px 4px hsl(188, 95%, 30%),
+    inset -2px -2px 4px hsl(188, 95%, 50%);
+}
+
+/* --- Animations fluides --- */
+* {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Responsive mobile --- */
+@media (max-width: 768px) {
+  .hidden-sm-inline { display: none; }
+  .color-picker { width: 40px; height: 40px; }
+}
