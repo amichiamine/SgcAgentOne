@@ -256,14 +256,24 @@
         }
         
         async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            if (!messageInput) {
+                console.error('Element messageInput non trouvé');
+                return;
+            }
+            
             const message = messageInput.value.trim();
             if (!message) return;
             
             // Afficher le message utilisateur
             addMessage(message, true);
             messageInput.value = '';
-            sendButton.disabled = true;
-            sendButton.textContent = 'Envoi...';
+            
+            const sendButton = document.getElementById('sendButton');
+            if (sendButton) {
+                sendButton.disabled = true;
+                sendButton.textContent = 'Envoi...';
+            }
             
             try {
                 const token = await getAuthToken();
@@ -306,8 +316,10 @@
                 addMessage(`❌ Erreur de connexion: ${error.message}`);
             }
             
-            sendButton.disabled = false;
-            sendButton.textContent = 'Envoyer';
+            if (sendButton) {
+                sendButton.disabled = false;
+                sendButton.textContent = 'Envoyer';
+            }
             messageInput.focus();
         }
         
