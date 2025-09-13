@@ -3,40 +3,50 @@
  * Gestion de l'interface d'exploration des fichiers avec navigation entre dossiers
  */
 
-// Fonction de détection automatique du chemin de base de l'API
-function getApiBase() {
+// Fonction universelle de détection automatique du projet
+function getProjectInfo() {
     const currentPath = window.location.pathname;
     const hostname = window.location.hostname;
     
-    // Cas spécial Replit : chemin commence par /extensions/, /deployment/ ou /core/
-    // mais on est à la racine du serveur
-    if (currentPath.startsWith('/extensions/') || 
-        currentPath.startsWith('/deployment/') || 
-        currentPath.startsWith('/core/') ||
-        hostname.includes('.replit.dev')) {
-        return '/api/';
+    // Détection automatique du nom de dossier projet
+    let projectName = '';
+    
+    // Extraire le nom depuis la structure des chemins
+    if (currentPath.includes('/extensions/')) {
+        const beforeExtensions = currentPath.substring(0, currentPath.indexOf('/extensions/'));
+        projectName = beforeExtensions.split('/').filter(p => p).pop() || '';
+    } else if (currentPath.includes('/deployment/')) {
+        const beforeDeployment = currentPath.substring(0, currentPath.indexOf('/deployment/'));
+        projectName = beforeDeployment.split('/').filter(p => p).pop() || '';
+    } else if (currentPath.includes('/core/')) {
+        const beforeCore = currentPath.substring(0, currentPath.indexOf('/core/'));
+        projectName = beforeCore.split('/').filter(p => p).pop() || '';
     }
     
-    // Déploiement XAMPP/hébergement : détecter le sous-dossier
-    // Chercher les marqueurs de structure dans un sous-dossier
-    const markers = ['/extensions/', '/deployment/', '/core/'];
-    for (const marker of markers) {
-        if (currentPath.includes(marker) && !currentPath.startsWith(marker)) {
-            const basePath = currentPath.substring(0, currentPath.indexOf(marker));
-            return basePath + '/api/';
+    // Si pas trouvé et qu'on est dans un sous-dossier
+    if (!projectName && currentPath.match(/^\/[^/]+\//)) {
+        const segments = currentPath.split('/').filter(p => p);
+        if (segments.length > 0) {
+            projectName = segments[0];
         }
     }
     
-    // Fallback : si chemin commence par /segment/, utiliser ce segment
-    if (currentPath.match(/^\/[^/]+\//)) {
-        const segments = currentPath.split('/');
-        if (segments.length > 1 && segments[1]) {
-            return '/' + segments[1] + '/api/';
-        }
-    }
+    // Détection spéciale Replit vs XAMPP/hébergement
+    const isReplit = hostname.includes('.replit.dev') || hostname === 'localhost';
     
-    // Par défaut, racine
-    return '/api/';
+    return {
+        name: projectName || 'sgc-agentone', // fallback par défaut
+        isReplit: isReplit,
+        basePath: projectName ? `/${projectName}` : '',
+        themePath: projectName ? `/${projectName}/theme` : '/theme',
+        apiPath: projectName ? `/${projectName}/api` : '/api'
+    };
+}
+
+// Fonction de détection automatique du chemin de base de l'API
+function getApiBase() {
+    const projectInfo = getProjectInfo();
+    return projectInfo.apiPath + '/';
 }
 
 class SGCFiles {
