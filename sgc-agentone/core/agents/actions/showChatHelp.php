@@ -33,6 +33,12 @@ function executeAction_showchathelp($params, $projectPath) {
     $helpResponse .= "• `modifie le fichier nom.ext` - Modifier un fichier\n";
     $helpResponse .= "• `lis le fichier nom.ext` - Lire le contenu\n\n";
     
+    $helpResponse .= "💻 **Implémentation de code :**\n";
+    $helpResponse .= "• `modifie le fichier index.html avec le code suivant: <votre code>`\n";
+    $helpResponse .= "• `crée un fichier script.js avec le code suivant: <votre code>`\n";
+    $helpResponse .= "• `change le contenu style.css avec le code suivant: <votre code>`\n";
+    $helpResponse .= "⚡ Astuce : Remplacez 'implémente' par 'modifie' ou 'crée'\n\n";
+    
     $helpResponse .= "🗄️ **Base de données :**\n";
     $helpResponse .= "• `connecte à la base` - Créer/connecter BDD\n";
     $helpResponse .= "• `exécute la requête SQL...` - Lancer une requête\n\n";
