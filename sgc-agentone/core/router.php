@@ -49,8 +49,8 @@ if ($requestMethod === 'HEAD' && ($requestUri === '/api' || strpos($requestUri, 
 }
 
 // Routes API - priorité absolue, pas d'output avant
-if (strpos($requestUri, '/api/auth/token') === 0 || $requestUri === '/api/auth/token') {
-    // Inclusion de l'API auth
+if (strpos($requestUri, '/api/auth') === 0 || $requestUri === '/api/auth' || $requestUri === '/api/auth/token') {
+    // Inclusion de l'API auth (support pour /api/auth et /api/auth/token)
     $authApiFile = $projectRoot . '/sgc-agentone/core/api/auth.php';
     if (file_exists($authApiFile)) {
         include $authApiFile;

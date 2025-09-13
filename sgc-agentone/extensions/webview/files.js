@@ -10,11 +10,11 @@ class SGCFiles {
         this.selectedFiles = [];
         this.history = ['.'];
         this.historyIndex = 0;
-        this.apiKey = 'sgc-agent-dev-key-2024';
+        this.apiToken = null;
         
         this.initializeElements();
         this.setupEventListeners();
-        this.loadCurrentDirectory();
+        this.initializeAuth();
         
         console.log('SGC Files Explorer initialisé');
     }
@@ -120,18 +120,46 @@ class SGCFiles {
         });
     }
 
+    async initializeAuth() {
+        try {
+            const response = await fetch('/api/auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    client_type: 'webview'
+                })
+            });
+            
+            if (response.ok) {
+                const authData = await response.json();
+                this.apiToken = authData.token;
+                this.loadCurrentDirectory();
+            } else {
+                this.showError('Erreur d\'authentification');
+            }
+        } catch (error) {
+            console.error('Erreur d\'authentification:', error);
+            this.showError('Impossible de s\'authentifier');
+        }
+    }
+
     async loadCurrentDirectory() {
-        if (this.isLoading) return;
+        if (this.isLoading || !this.apiToken) return;
         
         this.setLoading(true);
         this.hideError();
         this.updateStatus('Chargement du dossier...');
         
         try {
+            const headers = { 'Content-Type': 'application/json' };
+            if (this.apiToken) {
+                headers['X-API-Key'] = this.apiToken;
+            }
+            
             const response = await fetch(`/api/files/list?dir=${encodeURIComponent(this.currentPath)}`, {
-                headers: {
-                    'X-API-Key': this.apiKey
-                }
+                headers: headers
             });
             
             if (!response.ok) {
@@ -399,12 +427,14 @@ class SGCFiles {
         try {
             const filePath = this.currentPath === '.' ? fileName : `${this.currentPath}/${fileName}`;
             
+            const headers = { 'Content-Type': 'application/json' };
+            if (this.apiToken) {
+                headers['X-API-Key'] = this.apiToken;
+            }
+            
             const response = await fetch('/api/files/create', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': this.apiKey
-                },
+                headers: headers,
                 body: JSON.stringify({
                     path: filePath,
                     content: fileContent
@@ -440,12 +470,14 @@ class SGCFiles {
             // (since the API doesn't have a specific create folder endpoint)
             const tempFilePath = `${folderPath}/.sgc-temp`;
             
+            const headers = { 'Content-Type': 'application/json' };
+            if (this.apiToken) {
+                headers['X-API-Key'] = this.apiToken;
+            }
+            
             const response = await fetch('/api/files/create', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': this.apiKey
-                },
+                headers: headers,
                 body: JSON.stringify({
                     path: tempFilePath,
                     content: 'temp'
@@ -457,12 +489,14 @@ class SGCFiles {
             }
             
             // Remove the temporary file
+            const deleteHeaders = { 'Content-Type': 'application/json' };
+            if (this.apiToken) {
+                deleteHeaders['X-API-Key'] = this.apiToken;
+            }
+            
             await fetch('/api/files/delete', {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': this.apiKey
-                },
+                headers: deleteHeaders,
                 body: JSON.stringify({
                     path: tempFilePath
                 })

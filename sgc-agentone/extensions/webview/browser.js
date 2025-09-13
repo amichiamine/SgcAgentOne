@@ -11,13 +11,38 @@ class SGCBrowser {
         this.bookmarks = this.loadBookmarks();
         this.isLoading = false;
         this.isFullscreen = false;
+        this.apiToken = null;
         
         this.initializeElements();
         this.setupEventListeners();
         this.initializeBookmarks();
         this.showQuickAccess();
+        this.initializeAuth();
         
         console.log('SGC Browser initialisé');
+    }
+
+    async initializeAuth() {
+        try {
+            const response = await fetch('/api/auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    client_type: 'webview'
+                })
+            });
+            
+            if (response.ok) {
+                const authData = await response.json();
+                this.apiToken = authData.token;
+            } else {
+                console.error('Erreur d\'authentification browser');
+            }
+        } catch (error) {
+            console.error('Erreur d\'authentification browser:', error);
+        }
     }
 
     initializeElements() {
@@ -410,11 +435,19 @@ class SGCBrowser {
 
     async showHtmlFiles() {
         try {
+            // Get API token first if not already available
+            if (!this.apiToken) {
+                await this.initializeAuth();
+            }
+            
+            const headers = {};
+            if (this.apiToken) {
+                headers['X-API-Key'] = this.apiToken;
+            }
+            
             // Get HTML files from the files API
             const response = await fetch('/api/files/list', {
-                headers: {
-                    'X-API-Key': 'sgc-agent-dev-key-2024'
-                }
+                headers: headers
             });
             
             if (response.ok) {
