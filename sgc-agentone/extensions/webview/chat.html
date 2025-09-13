@@ -4,15 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SGC-AgentOne Chat</title>
-    <!-- Fonts -->
-    <link rel="stylesheet" href="theme/fonts.css">
+    <!-- Configuration dynamique des chemins CSS -->
+    <script>
+        // Fonction universelle de détection automatique du projet
+        function getProjectInfo() {
+            const currentPath = window.location.pathname;
+            const hostname = window.location.hostname;
+            
+            // Détection automatique du nom de dossier projet
+            let projectName = '';
+            
+            // Extraire le nom depuis la structure des chemins
+            if (currentPath.includes('/extensions/')) {
+                const beforeExtensions = currentPath.substring(0, currentPath.indexOf('/extensions/'));
+                projectName = beforeExtensions.split('/').filter(p => p).pop() || '';
+            } else if (currentPath.includes('/deployment/')) {
+                const beforeDeployment = currentPath.substring(0, currentPath.indexOf('/deployment/'));
+                projectName = beforeDeployment.split('/').filter(p => p).pop() || '';
+            } else if (currentPath.includes('/core/')) {
+                const beforeCore = currentPath.substring(0, currentPath.indexOf('/core/'));
+                projectName = beforeCore.split('/').filter(p => p).pop() || '';
+            }
+            
+            // Si pas trouvé et qu'on est dans un sous-dossier
+            if (!projectName && currentPath.match(/^\/[^/]+\//)) {
+                const segments = currentPath.split('/').filter(p => p);
+                if (segments.length > 0) {
+                    projectName = segments[0];
+                }
+            }
+            
+            // Fallback : détecter depuis le script courant
+            if (!projectName) {
+                const scripts = Array.from(document.scripts);
+                for (const script of scripts) {
+                    if (script.src && script.src.includes('/extensions/')) {
+                        const url = new URL(script.src);
+                        const path = url.pathname;
+                        if (path.includes('/extensions/')) {
+                            const beforeExt = path.substring(0, path.indexOf('/extensions/'));
+                            projectName = beforeExt.split('/').filter(p => p).pop() || '';
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Détection spéciale Replit vs XAMPP/hébergement
+            const isReplit = hostname.includes('.replit.dev') || hostname === 'localhost';
+            
+            return {
+                name: projectName || 'sgc-agentone', // fallback par défaut
+                isReplit: isReplit,
+                basePath: projectName ? `/${projectName}` : '',
+                themePath: projectName ? `/${projectName}/theme` : '/theme',
+                apiPath: projectName ? `/${projectName}/api` : '/api'
+            };
+        }
+        
+        // Appliquer les chemins CSS dynamiquement
+        const projectInfo = getProjectInfo();
+        document.write('<link rel="stylesheet" href="' + projectInfo.themePath + '/fonts.css">');
+        document.write('<link rel="stylesheet" href="' + projectInfo.themePath + '/colors.css">');
+        document.write('<link rel="stylesheet" href="' + projectInfo.themePath + '/syntax.css">');
+    </script>
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Monaco Editor -->
     <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.41.0/min/vs/editor/editor.main.css">
-    <!-- Theme -->
-    <link rel="stylesheet" href="theme/colors.css">
-    <link rel="stylesheet" href="theme/syntax.css">
     <style>
         body {
             margin: 0;
@@ -293,38 +352,8 @@
     <script>
         // Fonction de détection automatique du chemin de base de l'API
         function getApiBase() {
-            const currentPath = window.location.pathname;
-            const hostname = window.location.hostname;
-            
-            // Cas spécial Replit : chemin commence par /extensions/, /deployment/ ou /core/
-            // mais on est à la racine du serveur
-            if (currentPath.startsWith('/extensions/') || 
-                currentPath.startsWith('/deployment/') || 
-                currentPath.startsWith('/core/') ||
-                hostname.includes('.replit.dev')) {
-                return '/api/';
-            }
-            
-            // Déploiement XAMPP/hébergement : détecter le sous-dossier
-            // Chercher les marqueurs de structure dans un sous-dossier
-            const markers = ['/extensions/', '/deployment/', '/core/'];
-            for (const marker of markers) {
-                if (currentPath.includes(marker) && !currentPath.startsWith(marker)) {
-                    const basePath = currentPath.substring(0, currentPath.indexOf(marker));
-                    return basePath + '/api/';
-                }
-            }
-            
-            // Fallback : si chemin commence par /segment/, utiliser ce segment
-            if (currentPath.match(/^\/[^/]+\//)) {
-                const segments = currentPath.split('/');
-                if (segments.length > 1 && segments[1]) {
-                    return '/' + segments[1] + '/api/';
-                }
-            }
-            
-            // Par défaut, racine
-            return '/api/';
+            const projectInfo = getProjectInfo();
+            return projectInfo.apiPath + '/';
         }
         
         // Variables globales
