@@ -291,6 +291,11 @@ class SGCBrowser {
     cleanUrl(url) {
         url = url.trim();
         
+        // Ne pas modifier les chemins relatifs
+        if (url.startsWith('/') || url.startsWith('./') || url.startsWith('../')) {
+            return url;
+        }
+        
         // Add protocol if missing
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
             // Check if it looks like a domain
@@ -303,8 +308,8 @@ class SGCBrowser {
     }
 
     isValidUrl(url) {
-        // Accepter les URLs relatives (commencent par /)
-        if (url.startsWith('/')) {
+        // Accepter les URLs relatives (commencent par / ou ./ ou ../)
+        if (url.startsWith('/') || url.startsWith('./') || url.startsWith('../')) {
             return true;
         }
         
@@ -471,11 +476,11 @@ class SGCBrowser {
         switch (type) {
             case 'local':
                 // Preview the main SGC-AgentOne interface
-                url = '/';
+                url = '../../';
                 break;
             case 'server':
                 // Preview the plug & play deployment
-                url = '/deployment/plugandplay/';
+                url = '../../deployment/plugandplay/';
                 break;
             case 'files':
                 this.showHtmlFiles();
